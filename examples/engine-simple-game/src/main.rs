@@ -98,6 +98,8 @@ impl engine::Game for Game {
     fn update(&mut self, engine: &mut Engine) {
         let dir = engine.input.key_axis(engine::Key::Left, engine::Key::Right);
         self.guy.pos.x += dir * GUY_SPEED;
+        let y_dir = engine.input.key_axis(engine::Key::Down, engine::Key::Up);
+        self.guy.pos.y += y_dir * GUY_SPEED;
         let mut contacts = Vec::with_capacity(self.walls.len());
         // TODO: for multiple guys this might be better as flags on the guy for what side he's currently colliding with stuff on
         for _iter in 0..COLLISION_STEPS {

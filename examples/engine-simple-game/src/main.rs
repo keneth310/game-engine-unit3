@@ -102,6 +102,12 @@ impl engine::Game for Game {
         self.guy.pos.y += y_dir * GUY_SPEED;
         let mut contacts = Vec::with_capacity(self.walls.len());
         // TODO: for multiple guys this might be better as flags on the guy for what side he's currently colliding with stuff on
+        // Update camera position to follow the guy
+        let guy_screen_pos = Vec2 {
+            x: self.guy.pos.x - self.camera.screen_size[0] / 2.0,
+            y: self.guy.pos.y - self.camera.screen_size[1] / 2.0,
+            };
+        self.camera.screen_pos = [guy_screen_pos.x, guy_screen_pos.y];
         for _iter in 0..COLLISION_STEPS {
             let guy_aabb = AABB {
                 center: self.guy.pos,

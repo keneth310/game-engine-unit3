@@ -208,11 +208,11 @@ impl engine::Game for Game {
         // set guy
         trfs[guy_idx] = AABB {
             center: self.guy.pos,
-            size: Vec2 { x: 16.0, y: 16.0 },
+            size: Vec2 { x: 13.0, y: 17.0 },
         }
         .into();
         // TODO animation frame
-        uvs[guy_idx] = SheetRegion::new(0, 16, 480, 8, 16, 16);
+        uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
         // set apple
         let apple_start = guy_idx + 1;
         for (apple, (trf, uv)) in self.apples.iter().zip(

@@ -1,0 +1,10 @@
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/cc-046028a06f0d941c.rmeta: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe/unix.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/windows_registry.rs
+
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/libcc-046028a06f0d941c.rlib: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe/unix.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/windows_registry.rs
+
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/cc-046028a06f0d941c.d: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe/unix.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/windows_registry.rs
+
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/lib.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/os_pipe/unix.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cc-1.0.83/src/windows_registry.rs:

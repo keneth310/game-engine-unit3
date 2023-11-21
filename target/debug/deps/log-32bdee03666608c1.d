@@ -1,0 +1,10 @@
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/log-32bdee03666608c1.rmeta: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/macros.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/serde.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/__private_api.rs
+
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/liblog-32bdee03666608c1.rlib: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/macros.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/serde.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/__private_api.rs
+
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/log-32bdee03666608c1.d: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/macros.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/serde.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/__private_api.rs
+
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/lib.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/macros.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/serde.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/log-0.4.20/src/__private_api.rs:

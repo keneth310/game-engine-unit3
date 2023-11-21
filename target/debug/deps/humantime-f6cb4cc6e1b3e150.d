@@ -1,0 +1,10 @@
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/humantime-f6cb4cc6e1b3e150.rmeta: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/duration.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/wrapper.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/date.rs
+
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/libhumantime-f6cb4cc6e1b3e150.rlib: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/duration.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/wrapper.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/date.rs
+
+/Users/kenethgonzalez-hernandez/181g/frenderer/target/debug/deps/humantime-f6cb4cc6e1b3e150.d: /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/lib.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/duration.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/wrapper.rs /Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/date.rs
+
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/lib.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/duration.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/wrapper.rs:
+/Users/kenethgonzalez-hernandez/.cargo/registry/src/index.crates.io-6f17d22bba15001f/humantime-2.1.0/src/date.rs:

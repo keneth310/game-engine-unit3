@@ -213,6 +213,16 @@ impl engine::Game for Game {
         .into();
         // TODO animation frame
         uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
+        // left
+        if engine.input.is_key_down(engine::Key::Left) {
+            uvs[guy_idx] = SheetRegion::new(0, 656, 0, 8, 13, 17);
+        }
+        if engine.input.is_key_down(engine::Key::Right) {
+            uvs[guy_idx] = SheetRegion::new(0, 669, 0, 8, 13, 17);
+        }
+        if engine.input.is_key_down(engine::Key::Up) {
+            uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);
+        }
         // set apple
         let apple_start = guy_idx + 1;
         for (apple, (trf, uv)) in self.apples.iter().zip(
@@ -225,7 +235,7 @@ impl engine::Game for Game {
                 size: Vec2 { x: 16.0, y: 16.0 },
             }
             .into();
-            *uv = SheetRegion::new(0, 0, 496, 4, 16, 16);
+            *uv = SheetRegion::new(0, 0, 496, 4, 16, 1);
         }
         let sprite_count = apple_start + self.apples.len();
         let score_str = self.score.to_string();

@@ -210,7 +210,7 @@ impl engine::Game for Game {
 
                     let door = self.doors[*door_idx];
                     // We got to a basically zero collision amount
- 
+                    // yes
                     // todo - 
                     // make a list of doors
                     // assign them with a list of coordinates

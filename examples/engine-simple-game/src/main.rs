@@ -6,7 +6,7 @@ use engine_simple::{geom::*, Camera, Engine, SheetRegion, Transform, Zeroable};
 use rand::Rng;
 const W: f32 = 480.0;
 const H: f32 = 240.0;
-const GUY_SPEED: f32 = 4.0;
+const GUY_SPEED: f32 = 2.0;
 const SPRITE_MAX: usize = 16;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
@@ -22,7 +22,9 @@ struct Apple {
 struct Game {
     camera: engine::Camera,
     walls: Vec<AABB>,
+    doors: Vec<AABB>,
     guy: Guy,
+    guy2: Guy,
     apples: Vec<Apple>,
     apple_timer: u32,
     score: u32,
@@ -33,7 +35,7 @@ impl engine::Game for Game {
     fn new(engine: &mut Engine) -> Self {
         let camera = Camera {
             screen_pos: [0.0, 0.0],
-            screen_size: [W/2.0, H/2.0],
+            screen_size: [W / 2.0, H / 2.0],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {
@@ -64,6 +66,9 @@ impl engine::Game for Game {
                 y: 24.0,
             },
         };
+        let guy2 = Guy {
+            pos: Vec2 { x: 100.0, y: 200.0 },
+        };
         let floor = AABB {
             center: Vec2 { x: W / 2.0, y: 8.0 },
             size: Vec2 { x: W, y: 16.0 },
@@ -80,6 +85,16 @@ impl engine::Game for Game {
             size: Vec2 { x: 16.0, y: H },
         };
 
+        let door = AABB {
+            center: Vec2 { x: 100.0, y: 200.0 },
+            size: Vec2 { x: 16.0, y: 16.0 },
+        };
+
+        let door = AABB {
+            center: Vec2 { x: 220.0, y: 120.0 },
+            size: Vec2 { x: 16.0, y: 16.0 },
+        };
+
         let font = engine::BitFont::with_sheet_region(
             '0'..='9',
             SheetRegion::new(0, 0, 512, 0, 80, 8),
@@ -88,7 +103,9 @@ impl engine::Game for Game {
         Game {
             camera,
             guy,
+            guy2,
             walls: vec![left_wall, right_wall, floor],
+            doors: vec![door],
             apples: Vec::with_capacity(16),
             apple_timer: 0,
             score: 0,
@@ -96,18 +113,20 @@ impl engine::Game for Game {
         }
     }
     fn update(&mut self, engine: &mut Engine) {
+        // Update camera position to follow the guy
+        let guy_screen_pos = Vec2 {
+            x: self.guy.pos.x - self.camera.screen_size[0] / 2.0,
+            y: self.guy.pos.y - self.camera.screen_size[1] / 2.0,
+        };
+        self.camera.screen_pos = [guy_screen_pos.x, guy_screen_pos.y];
+
         let dir = engine.input.key_axis(engine::Key::Left, engine::Key::Right);
         self.guy.pos.x += dir * GUY_SPEED;
         let y_dir = engine.input.key_axis(engine::Key::Down, engine::Key::Up);
         self.guy.pos.y += y_dir * GUY_SPEED;
         let mut contacts = Vec::with_capacity(self.walls.len());
         // TODO: for multiple guys this might be better as flags on the guy for what side he's currently colliding with stuff on
-        // Update camera position to follow the guy
-        let guy_screen_pos = Vec2 {
-            x: self.guy.pos.x - self.camera.screen_size[0] / 2.0,
-            y: self.guy.pos.y - self.camera.screen_size[1] / 2.0,
-            };
-        self.camera.screen_pos = [guy_screen_pos.x, guy_screen_pos.y];
+        // Main Characters Hit Box
         for _iter in 0..COLLISION_STEPS {
             let guy_aabb = AABB {
                 center: self.guy.pos,
@@ -136,6 +155,7 @@ impl engine::Game for Game {
                     center: self.guy.pos,
                     size: Vec2 { x: 16.0, y: 16.0 },
                 };
+
                 let wall = self.walls[*wall_idx];
                 let mut disp = wall.displacement(guy_aabb).unwrap_or(Vec2::ZERO);
                 // We got to a basically zero collision amount
@@ -159,120 +179,205 @@ impl engine::Game for Game {
                 }
             }
         }
-        let mut rng = rand::thread_rng();
-        if self.apple_timer > 0 {
-            self.apple_timer -= 1;
-        } else if self.apples.len() < 8 {
-            self.apples.push(Apple {
-                pos: Vec2 {
-                    x: rng.gen_range(8.0..(W - 8.0)),
-                    y: H + 8.0,
+            // copying colission for doors
+            for _iter in 0..COLLISION_STEPS {
+                // player's collision box
+                let guy_aabb = AABB {
+                    center: self.guy.pos,
+                    size: Vec2 { x: 16.0, y: 16.0 },
+                };
+                contacts.clear();
+                contacts.extend(
+                    self.doors
+                        .iter()
+                        .enumerate()
+                        .filter_map(|(ri, w)| w.displacement(guy_aabb).map(|d| (ri, d))),
+                );
+                if contacts.is_empty() {
+                    break;
+                }
+                // This part stays mostly the same for multiple guys, except the shape of contacts is different
+                contacts.sort_by(|(_r1i, d1), (_r2i, d2)| {
+                    d2.length_squared()
+                        .partial_cmp(&d1.length_squared())
+                        .unwrap()
+                });
+                for (door_idx, _disp) in contacts.iter() {
+                    let guy_aabb = AABB {
+                        center: self.guy.pos,
+                        size: Vec2 { x: 16.0, y: 16.0 },
+                    };
+
+                    let door = self.doors[*door_idx];
+                    // We got to a basically zero collision amount
+ 
+                    // todo - 
+                    // make a list of doors
+                    // assign them with a list of coordinates
+                    // Guy is left of wall, push left
+                    // tuple to create (doorID, position)
+                    
+                    if self.guy.pos.x < door.center.x {
+                        println!("guy position: {}",self.guy.pos.x);
+                        println!("door center: {}",door.center.x);
+                        self.guy.pos.x = 100.0;
+                        self.guy.pos.y = 100.0;
+
+                    }
+                    // Guy is below wall, push down
+                    if self.guy.pos.y < door.center.y {
+                        println!("guy position: {}",self.guy.pos.x);
+                        println!("door center: {}",door.center.x);
+                        self.guy.pos.x = 100.0;
+                        self.guy.pos.y = 100.0;
+                    }
+                    
+                }
+            }
+
+            let mut rng = rand::thread_rng();
+            if self.apple_timer > 0 {
+                self.apple_timer -= 1;
+            } else if self.apples.len() < 8 {
+                self.apples.push(Apple {
+                    pos: Vec2 {
+                        x: rng.gen_range(8.0..(W - 8.0)),
+                        y: H + 8.0,
+                    },
+                    vel: Vec2 {
+                        x: 0.0,
+                        y: rng.gen_range((-4.0)..(-1.0)),
+                    },
+                });
+                self.apple_timer = rng.gen_range(30..90);
+            }
+            for apple in self.apples.iter_mut() {
+                apple.pos += apple.vel;
+            }
+            if let Some(idx) = self
+                .apples
+                .iter()
+                .position(|apple| apple.pos.distance(self.guy.pos) <= CATCH_DISTANCE)
+            {
+                self.apples.swap_remove(idx);
+                self.score += 1;
+            }
+            self.apples.retain(|apple| apple.pos.y > -8.0)
+        }
+        fn render(&mut self, engine: &mut Engine) {
+            // set bg image
+            let (trfs, uvs) = engine.renderer.sprites.get_sprites_mut(0);
+            trfs[0] = AABB {
+                center: Vec2 {
+                    x: W / 2.0,
+                    y: H / 2.0,
                 },
-                vel: Vec2 {
-                    x: 0.0,
-                    y: rng.gen_range((-4.0)..(-1.0)),
-                },
-            });
-            self.apple_timer = rng.gen_range(30..90);
-        }
-        for apple in self.apples.iter_mut() {
-            apple.pos += apple.vel;
-        }
-        if let Some(idx) = self
-            .apples
-            .iter()
-            .position(|apple| apple.pos.distance(self.guy.pos) <= CATCH_DISTANCE)
-        {
-            self.apples.swap_remove(idx);
-            self.score += 1;
-        }
-        self.apples.retain(|apple| apple.pos.y > -8.0)
-    }
-    fn render(&mut self, engine: &mut Engine) {
-        // set bg image
-        let (trfs, uvs) = engine.renderer.sprites.get_sprites_mut(0);
-        trfs[0] = AABB {
-            center: Vec2 {
-                x: W / 2.0,
-                y: H / 2.0,
-            },
-            size: Vec2 { x: W, y: H },
-        }
-        .into();
-        uvs[0] = SheetRegion::new(0, 0, 566, 16, 2048, 1024);
-        // set walls
-        const WALL_START: usize = 1;
-        let guy_idx = WALL_START + self.walls.len();
-        for (wall, (trf, uv)) in self.walls.iter().zip(
-            trfs[WALL_START..guy_idx]
-                .iter_mut()
-                .zip(uvs[WALL_START..guy_idx].iter_mut()),
-        ) {
-            *trf = (*wall).into();
-            *uv = SheetRegion::new(0, 0, 480, 12, 8, 8);
-        }
-        // set guy
-        trfs[guy_idx] = AABB {
-            center: self.guy.pos,
-            size: Vec2 { x: 13.0, y: 17.0 },
-        }
-        .into();
-        // TODO animation frame
-        uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
-          // left
-        if engine.input.is_key_down(engine::Key::Left){
-            uvs[guy_idx] = SheetRegion::new(0, 656, 0, 8, 13, 17);
-        }
-        if engine.input.is_key_down(engine::Key::Right){
-            uvs[guy_idx] = SheetRegion::new(0, 669, 0, 8, 13, 17);
-        }
-        if engine.input.is_key_down(engine::Key::Up){
-            uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);
-        }
-        // set apple
-        let apple_start = guy_idx + 1;
-        for (apple, (trf, uv)) in self.apples.iter().zip(
-            trfs[apple_start..]
-                .iter_mut()
-                .zip(uvs[apple_start..].iter_mut()),
-        ) {
-            *trf = AABB {
-                center: apple.pos,
+                size: Vec2 { x: W, y: H },
+            }
+            .into();
+            uvs[0] = SheetRegion::new(0, 0, 566, 16, 2048, 1024);
+            // set walls
+            const WALL_START: usize = 1;
+            let guy_idx = WALL_START + self.walls.len();
+            let guy2_idx = guy_idx + 1;
+
+            for (wall, (trf, uv)) in self.walls.iter().zip(
+                trfs[WALL_START..guy_idx]
+                    .iter_mut()
+                    .zip(uvs[WALL_START..guy_idx].iter_mut()),
+            ) {
+                *trf = (*wall).into();
+                *uv = SheetRegion::new(0, 0, 566, 12, 1, 1);
+            }
+            trfs[guy2_idx] = AABB {
+                center: self.guy2.pos,
                 size: Vec2 { x: 16.0, y: 16.0 },
             }
             .into();
-            *uv = SheetRegion::new(0, 0, 496, 4, 16, 16);
-        }
-        let sprite_count = apple_start + self.apples.len();
-        let score_str = self.score.to_string();
-        let text_len = score_str.len();
-        engine.renderer.sprites.resize_sprite_group(
-            &engine.renderer.gpu,
-            0,
-            sprite_count + text_len,
-        );
-        self.font.draw_text(
-            &mut engine.renderer.sprites,
-            0,
-            sprite_count,
-            &score_str,
-            Vec2 {
-                x: 16.0,
-                y: H - 16.0,
+            uvs[guy2_idx] = SheetRegion::new(0, 16, 480, 8, 16, 16);
+            // set guy
+            trfs[guy_idx] = AABB {
+                center: self.guy.pos,
+                size: Vec2 { x: 13.0, y: 17.0 },
             }
-            .into(),
-            16.0,
-        );
-        engine
-            .renderer
-            .sprites
-            .upload_sprites(&engine.renderer.gpu, 0, 0..sprite_count + text_len);
-        engine
-            .renderer
-            .sprites
-            .set_camera_all(&engine.renderer.gpu, self.camera);
+            .into();
+            // TODO animation frame
+            uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
+            // left
+            if engine.input.is_key_down(engine::Key::Left) {
+                uvs[guy_idx] = SheetRegion::new(0, 656, 0, 8, 13, 17);
+            }
+            if engine.input.is_key_down(engine::Key::Right) {
+                uvs[guy_idx] = SheetRegion::new(0, 669, 0, 8, 13, 17);
+            }
+            if engine.input.is_key_down(engine::Key::Up) {
+                uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);
+            }
+
+            let door_start: usize = guy_idx + 2;
+            let end_of_doors: usize = door_start + self.doors.len();
+            //set door
+            for (door, (trf, uv)) in self.doors.iter().zip(
+                trfs[door_start..end_of_doors]
+                    .iter_mut()
+                    .zip(uvs[door_start..end_of_doors].iter_mut()),
+            ) {
+                *trf = (*door).into();
+                *uv = SheetRegion::new(0, 0, 566, 12, 1, 1);
+            }
+            trfs[guy2_idx] = AABB {
+                center: self.guy2.pos,
+                size: Vec2 { x: 16.0, y: 16.0 },
+            }
+            .into();
+
+
+            // set apple
+            let apple_start = guy_idx + 2 + self.doors.len();
+            for (apple, (trf, uv)) in self.apples.iter().zip(
+                trfs[apple_start..]
+                    .iter_mut()
+                    .zip(uvs[apple_start..].iter_mut()),
+            ) {
+                *trf = AABB {
+                    center: apple.pos,
+                    size: Vec2 { x: 16.0, y: 16.0 },
+                }
+                .into();
+                *uv = SheetRegion::new(0, 0, 496, 4, 16, 16);
+            }
+            let sprite_count = apple_start + self.apples.len();
+            let score_str = self.score.to_string();
+            let text_len = score_str.len();
+            engine.renderer.sprites.resize_sprite_group(
+                &engine.renderer.gpu,
+                0,
+                sprite_count + text_len,
+            );
+            self.font.draw_text(
+                &mut engine.renderer.sprites,
+                0,
+                sprite_count,
+                &score_str,
+                Vec2 {
+                    x: 16.0,
+                    y: H - 16.0,
+                }
+                .into(),
+                16.0,
+            );
+            engine.renderer.sprites.upload_sprites(
+                &engine.renderer.gpu,
+                0,
+                0..sprite_count + text_len,
+            );
+            engine
+                .renderer
+                .sprites
+                .set_camera_all(&engine.renderer.gpu, self.camera);
+        }
     }
-}
+
 fn main() {
     Engine::new(winit::window::WindowBuilder::new()).run::<Game>();
 }

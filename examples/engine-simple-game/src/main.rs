@@ -4,8 +4,8 @@ use engine_simple as engine;
 use engine_simple::wgpu;
 use engine_simple::{geom::*, Camera, Engine, SheetRegion, Transform, Zeroable};
 use rand::Rng;
-const W: f32 = 480.0;
-const H: f32 = 240.0;
+const W: f32 = 840.0;
+const H: f32 = 620.0;
 const GUY_SPEED: f32 = 2.0;
 const SPRITE_MAX: usize = 16;
 const CATCH_DISTANCE: f32 = 16.0;
@@ -35,7 +35,7 @@ impl engine::Game for Game {
     fn new(engine: &mut Engine) -> Self {
         let camera = Camera {
             screen_pos: [0.0, 0.0],
-            screen_size: [W / 2.0, H / 2.0],
+            screen_size: [W / 4.0, H / 4.0],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {
@@ -274,9 +274,19 @@ impl engine::Game for Game {
                 size: Vec2 { x: W, y: H },
             }
             .into();
-            uvs[0] = SheetRegion::new(0, 0, 566, 16, 2048, 1024);
+            uvs[0] = SheetRegion::new(0, 823, 0, 16, 420, 310);
+
+            trfs[1] = AABB {
+                center: Vec2 {
+                    x: W ,
+                    y: H * 2.0,
+                },
+                size: Vec2 { x: W, y: H },
+            }
+            .into();
+            uvs[1] = SheetRegion::new(0, 1347, 0, 16, 960, 320);
             // set walls
-            const WALL_START: usize = 1;
+            const WALL_START: usize = 2;
             let guy_idx = WALL_START + self.walls.len();
             let guy2_idx = guy_idx + 1;
 

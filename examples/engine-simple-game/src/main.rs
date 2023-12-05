@@ -9,7 +9,7 @@ use std::rc::Rc;
 const W: f32 = 840.0;
 const H: f32 = 620.0;
 const GUY_SPEED: f32 = 5.0;
-const SPRITE_MAX: usize = 16;
+const SPRITE_MAX: usize = 32;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
 const forest_void_x_position: f32 = 1200.0;
@@ -124,20 +124,56 @@ impl engine::Game for Game {
         let guy2 = Guy {
             pos: Vec2 { x: 100.0, y: 200.0 },
         };
-        let floor = AABB {
+        let floor_farm = AABB {
             center: Vec2 { x: W / 2.0, y: 8.0 },
             size: Vec2 { x: W, y: 16.0 },
         };
-        let left_wall = AABB {
+        let top_farm = AABB {
+            center: Vec2 { x: W / 2.0, y: H},
+            size: Vec2 { x: W, y: 16.0 },
+        };
+        let left_farm = AABB {
             center: Vec2 { x: 8.0, y: H / 2.0 },
             size: Vec2 { x: 16.0, y: H },
         };
-        let right_wall = AABB {
+        let right_farm = AABB {
             center: Vec2 {
                 x: W - 8.0,
                 y: H / 2.0,
             },
             size: Vec2 { x: 16.0, y: H },
+        };
+        let floor_forest = AABB {
+            center: Vec2 { x: 1200.0, y: 990.0 },
+            size: Vec2 { x: 1925.0, y: 16.0 },
+        };
+        let top_forest = AABB {
+            center: Vec2 { x: 1200.0, y: 1410.0},
+            size: Vec2 { x: 1925.0, y: 16.0 },
+        };
+        let left_forest = AABB {
+            center: Vec2 { x: 350.0, y: 1200.0 },
+            size: Vec2 { x: 16.0, y: H },
+        };
+        let right_forest = AABB {
+            center: Vec2 { x: 2055.0, y: 1200.0},
+            size: Vec2 { x: 16.0, y: H },
+        };
+        let floor_interior = AABB {
+            center: Vec2 { x: -300.0, y: -80.0 },
+            size: Vec2 { x: 160.0, y: 16.0 },
+        };
+        let top_interior = AABB {
+            center: Vec2 { x: -300.0, y: 80.0},
+            size: Vec2 { x: 160.0, y: 16.0 },
+        };
+        let left_interior = AABB {
+            center: Vec2 { x: -380.0, y: 0.0 },
+            size: Vec2 { x: 16.0, y: 160.0 },
+        };
+        let right_interior = AABB {
+            center: Vec2 { x: -220.0, y: 0.0},
+            size: Vec2 { x: 16.0, y: 160.0 },
         };
 
         let interior_to_home = Doors {
@@ -154,8 +190,8 @@ impl engine::Game for Game {
         };
         
         let forest_to_home = Doors {
-            center: Vec2 { x: 350.0, y: 1215.0 },
-            size: Vec2 { x: 16.0, y: 16.0 },
+            center: Vec2 { x: 367.0, y: 1215.0 },
+            size: Vec2 { x: 16.0, y: 28.0 },
             destination: Vec2{x: 800.0, y: 232.0},
 
         };
@@ -163,7 +199,7 @@ impl engine::Game for Game {
         let home_to_forest = Doors {
             center: Vec2 { x: 820.0, y: 232.0 },
             size: Vec2 { x: 16.0, y: 80.0 },
-            destination: Vec2{x: 370.0, y: 1215.0},
+            destination: Vec2{x: 390.0, y: 1215.0},
         };
 
 // font
@@ -207,7 +243,7 @@ impl engine::Game for Game {
             guy2,
             right_animation,
             animation_state, 
-            walls: vec![left_wall, right_wall, floor],
+            walls: vec![left_farm, right_farm, floor_farm, top_farm, left_forest, right_forest, floor_forest, top_forest, floor_interior, top_interior, right_interior, left_interior], 
             doors: vec![interior_to_home, home_to_interior, forest_to_home, home_to_forest],
             apples: Vec::with_capacity(16),
             apple_timer: 0,
@@ -434,6 +470,8 @@ impl engine::Game for Game {
                     .zip(uvs[WALL_START..guy_idx].iter_mut()),
             ) {
                 *trf = (*wall).into();
+                // handles the region for the walls 
+        
                 *uv = SheetRegion::new(0, 0, 566, 12, 1, 1);
             }
             trfs[guy2_idx] = AABB {

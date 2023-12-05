@@ -177,11 +177,11 @@ impl engine::Game for Game {
                 },
                 vel: Vec2 {
                     x: rng.gen_range((-4.0)..(4.0)),
-                    y: -20.0,
+                    y: -25.0,
                     //y: rng.gen_range((-4.0)..(-1.0)),
                 },
             });
-            self.asteroid_timer = 30;
+            self.asteroid_timer = 15;
         }
         for asteroid in self.asteroids.iter_mut() {
             asteroid.pos += asteroid.vel;
@@ -272,5 +272,5 @@ impl engine::Game for Game {
     }
 }
 fn main() {
-    Engine::new(winit::window::WindowBuilder::new()).run::<Game>();
+    Engine::new(winit::window::WindowBuilder::new().with_inner_size(winit::dpi::LogicalSize::new(400,800))).run::<Game>();
 }

@@ -5,9 +5,9 @@ use engine_simple::wgpu;
 use engine_simple::{geom::*, Camera, Engine, SheetRegion, Transform, Zeroable};
 use rand::Rng;
 const W: f32 = 320.0;
-const H: f32 = 240.0;
+const H: f32 = 640.0;
 const GUY_SPEED: f32 = 4.0;
-const SPRITE_MAX: usize = 16;
+const SPRITE_MAX: usize = 32;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
 struct Guy {
@@ -104,7 +104,7 @@ impl engine::Game for Game {
             camera,
             guy,
             walls: vec![left_wall, right_wall, floor],
-            asteroids: Vec::with_capacity(16),
+            asteroids: Vec::with_capacity(25),
             asteroid_timer: 0,
             lives: 3,
             font,
@@ -169,7 +169,7 @@ impl engine::Game for Game {
         let mut rng = rand::thread_rng();
         if self.asteroid_timer > 0 {
             self.asteroid_timer -= 1;
-        } else if self.asteroids.len() < 15 {
+        } else if self.asteroids.len() < 25 {
             self.asteroids.push(Asteroid {
                 pos: Vec2 {
                     x: rng.gen_range(8.0..(W - 8.0)),
@@ -177,7 +177,7 @@ impl engine::Game for Game {
                 },
                 vel: Vec2 {
                     x: 0.0,
-                    y: -5.0,
+                    y: -15.0,
                     //y: rng.gen_range((-4.0)..(-1.0)),
                 },
             });
@@ -207,7 +207,7 @@ impl engine::Game for Game {
             size: Vec2 { x: W, y: H },
         }
         .into();
-        uvs[0] = SheetRegion::new(0, 0, 0, 16, 128, 128);
+        uvs[0] = SheetRegion::new(0, 0, 1749, 16, 160, 640);
         // set walls
         const WALL_START: usize = 1;
         let guy_idx = WALL_START + self.walls.len();

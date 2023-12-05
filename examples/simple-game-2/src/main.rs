@@ -177,11 +177,11 @@ impl engine::Game for Game {
                 },
                 vel: Vec2 {
                     x: rng.gen_range((-4.0)..(4.0)),
-                    y: -15.0,
+                    y: -20.0,
                     //y: rng.gen_range((-4.0)..(-1.0)),
                 },
             });
-            self.asteroid_timer = rng.gen_range(30..90);
+            self.asteroid_timer = 30;
         }
         for asteroid in self.asteroids.iter_mut() {
             asteroid.pos += asteroid.vel;

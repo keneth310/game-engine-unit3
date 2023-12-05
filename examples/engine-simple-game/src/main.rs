@@ -24,7 +24,7 @@ struct Apple {
 struct Game {
     camera: engine::Camera,
     walls: Vec<AABB>,
-    doors: Vec<AABB>,
+    doors: Vec<Doors>,
     guy: Guy,
     guy2: Guy,
     right_animation: Animation, 
@@ -34,6 +34,7 @@ struct Game {
     score: u32,
     font: engine_simple::BitFont,
 }
+
 pub struct Animation {
     frames: Vec<SheetRegion>,  // Vector of frames (sprite regions)
     times: Vec<Duration>,      // Vector of times each frame should be displayed
@@ -106,6 +107,7 @@ impl engine::Game for Game {
             vec![SheetRegion::zeroed(); SPRITE_MAX],
             camera,
         );
+
         let guy = Guy {
             pos: Vec2 {
                 x: 150.0,
@@ -131,15 +133,32 @@ impl engine::Game for Game {
             size: Vec2 { x: 16.0, y: H },
         };
 
-        let door = AABB {
-            center: Vec2 { x: 100.0, y: 200.0 },
+        let interior_to_home = Doors {
+            center: Vec2 { x: -100.0, y: -100.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
+            destination: Vec2{x: 430.0, y: 305.0},
         };
 
-        let door = AABB {
-            center: Vec2 { x: 220.0, y: 120.0 },
+        let home_to_interior = Doors {
+            center: Vec2 { x: 400.0, y: 120.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
+            destination: Vec2{x: 430.0, y: 305.0},
+
         };
+        
+        let forest_to_home = Doors {
+            center: Vec2 { x: 600.0, y: 120.0 },
+            size: Vec2 { x: 16.0, y: 16.0 },
+            destination: Vec2{x: 430.0, y: 305.0},
+
+        };
+
+        let home_to_forest = Doors {
+            center: Vec2 { x: 700.0, y: 120.0 },
+            size: Vec2 { x: 16.0, y: 16.0 },
+            destination: Vec2{x: 430.0, y: 305.0},
+        };
+
 // font
 // 012345678
 // 9:;<=>?@A
@@ -150,7 +169,6 @@ impl engine::Game for Game {
 // ijklmnopqr
 // stuvwxy
 // z
-
 
         // need to edit the actual spritesheet
         let font = engine::BitFont::with_sheet_region(
@@ -183,7 +201,7 @@ impl engine::Game for Game {
             right_animation,
             animation_state, 
             walls: vec![left_wall, right_wall, floor],
-            doors: vec![door],
+            doors: vec![interior_to_home, home_to_interior, forest_to_home, home_to_forest],
             apples: Vec::with_capacity(16),
             apple_timer: 0,
             score: 0,
@@ -203,6 +221,7 @@ impl engine::Game for Game {
         let y_dir = engine.input.key_axis(engine::Key::Down, engine::Key::Up);
         self.guy.pos.y += y_dir * GUY_SPEED;
         let mut contacts = Vec::with_capacity(self.walls.len());
+        let mut door_contacts = Vec::<Doors>::with_capacity(self.doors.len());
         // TODO: for multiple guys this might be better as flags on the guy for what side he's currently colliding with stuff on
         // Main Characters Hit Box
         for _iter in 0..COLLISION_STEPS {
@@ -257,19 +276,28 @@ impl engine::Game for Game {
                 }
             }
         }
+
+        /////////////////////////////////////////////////
+        // COLLISION
             // copying collision for doors
             for _iter in 0..COLLISION_STEPS {
-                // player's collision box
                 let guy_aabb = AABB {
                     center: self.guy.pos,
                     size: Vec2 { x: 16.0, y: 16.0 },
                 };
+                // player's collision box
+                let player_hitbox = Doors {
+                    center: self.guy.pos,
+                    size: Vec2 { x: 16.0, y: 16.0 },
+                    destination: Vec2 {x: self.guy.pos[0], y: self.guy.pos[1]},
+                };
                 contacts.clear();
                 contacts.extend(
+                    // doors is a vec of doors
                     self.doors
                         .iter()
                         .enumerate()
-                        .filter_map(|(ri, w)| w.displacement(guy_aabb).map(|d| (ri, d))),
+                        .filter_map(|(ri, w)| w.displacement(player_hitbox).map(|d| (ri, d))),
                 );
                 if contacts.is_empty() {
                     break;
@@ -297,16 +325,20 @@ impl engine::Game for Game {
                     if self.guy.pos.x < door.center.x {
                         println!("guy position: {}",self.guy.pos.x);
                         println!("door center: {}",door.center.x);
-                        self.guy.pos.x = 430.0;
-                        self.guy.pos.y = 305.0;
+                        self.guy.pos.x = door.destination.x;
+                        self.guy.pos.y = door.destination.y;
+                        // self.guy.pos.x = 430.0;
+                        // self.guy.pos.y = 305.0;
 
                     }
                     // Guy is below wall, push down
                     if self.guy.pos.y < door.center.y {
                         println!("guy position: {}",self.guy.pos.x);
                         println!("door center: {}",door.center.x);
-                        self.guy.pos.x = 430.0;
-                        self.guy.pos.y = 330.0;
+                        self.guy.pos.x = door.destination.x;
+                        self.guy.pos.y = door.destination.y;
+                        // self.guy.pos.x = 430.0;
+                        // self.guy.pos.y = 330.0;
                     }
                     
                 }

@@ -108,8 +108,8 @@ impl engine::Game for Game {
         );
         let guy = Guy {
             pos: Vec2 {
-                x: W / 2.0,
-                y: 24.0,
+                x: 150.0,
+                y: 100.0,
             },
         };
         let guy2 = Guy {
@@ -297,16 +297,16 @@ impl engine::Game for Game {
                     if self.guy.pos.x < door.center.x {
                         println!("guy position: {}",self.guy.pos.x);
                         println!("door center: {}",door.center.x);
-                        self.guy.pos.x = 100.0;
-                        self.guy.pos.y = 100.0;
+                        self.guy.pos.x = 430.0;
+                        self.guy.pos.y = 305.0;
 
                     }
                     // Guy is below wall, push down
                     if self.guy.pos.y < door.center.y {
                         println!("guy position: {}",self.guy.pos.x);
                         println!("door center: {}",door.center.x);
-                        self.guy.pos.x = 100.0;
-                        self.guy.pos.y = 100.0;
+                        self.guy.pos.x = 430.0;
+                        self.guy.pos.y = 330.0;
                     }
                     
                 }

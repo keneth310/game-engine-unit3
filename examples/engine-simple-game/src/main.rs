@@ -353,7 +353,7 @@ impl engine::Game for Game {
                 size: Vec2 { x: W, y: H },
             }
             .into();
-            uvs[0] = SheetRegion::new(0, 823, 0, 16, 420, 310);
+            uvs[0] = SheetRegion::new(0, 814, 0, 16, 480, 320);
             // setting forest
             // const W: f32 = 840.0;
             // const H: f32 = 620.0;
@@ -366,7 +366,7 @@ impl engine::Game for Game {
             }
             .into();
 
-            uvs[1] = SheetRegion::new(0, 1347, 0, 16, 960, 310);
+            uvs[1] = SheetRegion::new(0, 1316, 0, 16, 960, 320);
             // forest background ^^
 
 

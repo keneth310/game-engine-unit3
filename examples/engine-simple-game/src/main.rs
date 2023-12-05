@@ -263,6 +263,7 @@ impl engine::Game for Game {
         self.guy.pos.x += dir * GUY_SPEED;
         let y_dir = engine.input.key_axis(engine::Key::Down, engine::Key::Up);
         self.guy.pos.y += y_dir * GUY_SPEED;
+
         let mut contacts = Vec::with_capacity(self.walls.len());
         let mut door_contacts = Vec::<Doors>::with_capacity(self.doors.len());
         // TODO: for multiple guys this might be better as flags on the guy for what side he's currently colliding with stuff on
@@ -504,19 +505,28 @@ impl engine::Game for Game {
             }
             .into();
             // TODO animation frame
+            // normal == up
             uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
 
-            // check here that if down, then down animation
 
+            // down
+            if engine.input.is_key_down(engine::Key::Down) {
+                uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
+            }
+
+            // up
+            if engine.input.is_key_down(engine::Key::Up) {
+                uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);
+            }
+
+            
             // left
             if engine.input.is_key_down(engine::Key::Left) {
                 uvs[guy_idx] = SheetRegion::new(0, 656, 0, 8, 13, 17);
             }
+            // check here that if down, then down animation
             if engine.input.is_key_down(engine::Key::Right) {
                 uvs[guy_idx] = self.right_animation.frames[0];
-            }
-            if engine.input.is_key_down(engine::Key::Up) {
-                uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);
             }
 
             let door_start: usize = guy_idx + 2;

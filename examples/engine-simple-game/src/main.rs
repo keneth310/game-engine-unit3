@@ -27,7 +27,7 @@ struct Game {
     doors: Vec<AABB>,
     guy: Guy,
     guy2: Guy,
-    animation: Animation, 
+    right_animation: Animation, 
     animation_state: AnimationState,
     apples: Vec<Apple>,
     apple_timer: u32,
@@ -146,9 +146,12 @@ impl engine::Game for Game {
             SheetRegion::new(0, 0, 512, 0, 80, 8),
             10,
         );
-        let mut animation = Animation { 
+        let mut right_animation = Animation { 
             frames: vec![
-                SheetRegion::new(0, 641, 0, 8, 13, 17)
+                // right animations: 
+                SheetRegion::new(0, 669, 0, 8, 13, 17),
+                SheetRegion::new(0, 669, 19, 8, 12, 17), 
+
             ], 
             times: vec![
                 Duration::from_millis(100),
@@ -163,7 +166,7 @@ impl engine::Game for Game {
             camera,
             guy,
             guy2,
-            animation,
+            right_animation,
             animation_state, 
             walls: vec![left_wall, right_wall, floor],
             doors: vec![door],
@@ -240,7 +243,7 @@ impl engine::Game for Game {
                 }
             }
         }
-            // copying colission for doors
+            // copying collision for doors
             for _iter in 0..COLLISION_STEPS {
                 // player's collision box
                 let guy_aabb = AABB {
@@ -372,7 +375,7 @@ impl engine::Game for Game {
             }
             .into();
             // TODO animation frame
-            uvs[guy_idx] = self.animation.frames[0];
+            uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
 
             // check here that if down, then down animation
 
@@ -381,7 +384,7 @@ impl engine::Game for Game {
                 uvs[guy_idx] = SheetRegion::new(0, 656, 0, 8, 13, 17);
             }
             if engine.input.is_key_down(engine::Key::Right) {
-                uvs[guy_idx] = SheetRegion::new(0, 669, 0, 8, 13, 17);
+                uvs[guy_idx] = self.right_animation.frames[0];
             }
             if engine.input.is_key_down(engine::Key::Up) {
                 uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);

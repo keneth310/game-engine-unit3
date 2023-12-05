@@ -89,7 +89,7 @@ impl engine::Game for Game {
         let camera = Camera {
             screen_pos: [0.0, 0.0],
             // here to zoom
-            screen_size: [W, H],
+            screen_size: [W / 3.5, H / 3.5],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {

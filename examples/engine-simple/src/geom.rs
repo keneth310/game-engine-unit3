@@ -14,9 +14,27 @@ pub struct AABB {
     pub center: Vec2,
     pub size: Vec2,
 }
+#[repr(C)]
+#[derive(Clone, Copy, PartialEq, bytemuck::Zeroable, bytemuck::Pod, Debug)]
+pub struct Doors{ 
+    pub center: Vec2,
+    pub size: Vec2,
+    pub destination: Vec2,
+}
 
 impl From<AABB> for Transform {
     fn from(val: AABB) -> Self {
+        Transform {
+            w: val.size.x as u16,
+            h: val.size.y as u16,
+            x: val.center.x,
+            y: val.center.y,
+            rot: 0.0,
+        }
+    }
+}
+impl From<Doors> for Transform {
+    fn from(val: Doors) -> Self {
         Transform {
             w: val.size.x as u16,
             h: val.size.y as u16,
@@ -57,8 +75,26 @@ impl From<AABB> for Camera2D {
     }
 }
 
+impl From<Doors> for Camera2D {
+    fn from(val: Doors) -> Self {
+        Camera2D {
+            screen_pos: (val.center - val.size / 2.0).into(),
+            screen_size: val.size.into(),
+        }
+    }
+}
+
 impl From<AABB> for Rect {
     fn from(val: AABB) -> Self {
+        Rect {
+            corner: (val.center - val.size / 2.0),
+            size: val.size,
+        }
+    }
+}
+
+impl From<Doors> for Rect {
+    fn from(val: Doors) -> Self {
         Rect {
             corner: (val.center - val.size / 2.0),
             size: val.size,
@@ -95,6 +131,11 @@ impl Rect {
 
 impl AABB {
     pub fn displacement(&self, other: AABB) -> Option<Vec2> {
+        Rect::from(*self).displacement(Rect::from(other))
+    }
+}
+impl Doors {
+    pub fn displacement(&self, other: Doors) -> Option<Vec2> {
         Rect::from(*self).displacement(Rect::from(other))
     }
 }

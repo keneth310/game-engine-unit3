@@ -12,6 +12,12 @@ const GUY_SPEED: f32 = 5.0;
 const SPRITE_MAX: usize = 16;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
+const forest_void_x_position: f32 = 1200.0;
+const forest_void_y_position: f32 = 1200.0;
+const interioir_void_x_position: f32 = -300.0;
+const interioir_void_y_position: f32 = 0.0;
+
+
 struct Guy {
     pos: Vec2,
 }
@@ -139,6 +145,8 @@ impl engine::Game for Game {
         let door = AABB {
             center: Vec2 { x: 220.0, y: 120.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
+            // destPost: Vec2 { x: 220.0, y: 120.0 }
+            //
         };
 // font
 // 012345678
@@ -293,7 +301,6 @@ impl engine::Game for Game {
                     // assign them with a list of coordinates
                     // Guy is left of wall, push left
                     // tuple to create (doorID, position)
-                    
                     if self.guy.pos.x < door.center.x {
                         println!("guy position: {}",self.guy.pos.x);
                         println!("door center: {}",door.center.x);
@@ -359,8 +366,8 @@ impl engine::Game for Game {
             // const H: f32 = 620.0;
             trfs[1] = AABB {
                 center: Vec2 {
-                    x: W ,
-                    y: H * 1.5,
+                    x: 1200.0 ,
+                    y: 1200.0 ,
                 },
                 size: Vec2 { x: 1920.0, y: H },
             }
@@ -370,8 +377,23 @@ impl engine::Game for Game {
             // forest background ^^
 
 
+
+            // interior room background VVV
+
+            trfs[2] = AABB {
+                center: Vec2 {
+                    x: -300.0,
+                    y: 0.0,
+                },
+                size: Vec2 { x: 160.0, y: 160.0 },
+            }
+            .into();
+
+            uvs[2] = SheetRegion::new(0, 2285, 0, 16, 160, 160);
+            // interior room background ^^
+
             // set walls
-            const WALL_START: usize = 2;
+            const WALL_START: usize = 3;
             let guy_idx = WALL_START + self.walls.len();
             let guy2_idx = guy_idx + 1;
 

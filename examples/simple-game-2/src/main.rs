@@ -176,7 +176,7 @@ impl engine::Game for Game {
                     y: H + 8.0,
                 },
                 vel: Vec2 {
-                    x: 0.0,
+                    x: rng.gen_range((-4.0)..(4.0)),
                     y: -15.0,
                     //y: rng.gen_range((-4.0)..(-1.0)),
                 },
@@ -217,7 +217,7 @@ impl engine::Game for Game {
                 .zip(uvs[WALL_START..guy_idx].iter_mut()),
         ) {
             *trf = (*wall).into();
-            *uv = SheetRegion::new(0, 0, 480, 12, 8, 8);
+            *uv = SheetRegion::new(0, 0, 4000, 12, 8, 8);
         }
         // set guy
         trfs[guy_idx] = AABB {

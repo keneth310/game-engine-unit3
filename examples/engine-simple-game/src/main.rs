@@ -4,6 +4,8 @@ use engine_simple as engine;
 use engine_simple::wgpu;
 use engine_simple::{geom::*, Camera, Engine, SheetRegion, Transform, Zeroable};
 use rand::Rng;
+use std::time::{Duration, Instant};
+use std::rc::Rc;
 const W: f32 = 840.0;
 const H: f32 = 620.0;
 const GUY_SPEED: f32 = 5.0;
@@ -25,11 +27,55 @@ struct Game {
     doors: Vec<AABB>,
     guy: Guy,
     guy2: Guy,
+    right_animation: Animation, 
+    animation_state: AnimationState,
     apples: Vec<Apple>,
     apple_timer: u32,
     score: u32,
     font: engine_simple::BitFont,
 }
+pub struct Animation {
+    frames: Vec<SheetRegion>,  // Vector of frames (sprite regions)
+    times: Vec<Duration>,      // Vector of times each frame should be displayed
+}
+
+impl Animation {
+    // Function to sample the animation at a given time
+    fn sample(&self, start_time: usize, now: usize, speedup_factor: usize) -> &SheetRegion {
+        // Calculate elapsed time
+        let elapsed_time = (now - start_time) * speedup_factor;
+
+        // Determine the current frame based on elapsed time
+        let mut current_frame = 0;
+        let mut accumulated_time = 0;
+        for (i, &frame_duration) in self.times.iter().enumerate() {
+            accumulated_time += frame_duration.as_millis() as usize;
+            if elapsed_time < accumulated_time {
+                current_frame = i;
+                break;
+            }
+        }
+
+        // Return the frame to be displayed
+        &self.frames[current_frame]
+    }
+}
+
+// Define your AnimationState struct
+pub struct AnimationState {
+    current_animation: usize,
+    start_time: usize,        // Starting time of the animation
+    current_time: usize,      // Current time of the animation
+}
+
+// Implement methods for the AnimationState struct
+impl AnimationState {
+    // Function to tick the animation state
+    fn tick(&mut self, now: usize) {
+        self.current_time = now;
+    }
+}
+
 
 impl engine::Game for Game {
     fn new(engine: &mut Engine) -> Self {
@@ -114,11 +160,28 @@ impl engine::Game for Game {
             SheetRegion::new(0, 645, 75, 0, 160, 16),
             9,
         );
+        let mut right_animation = Animation { 
+            frames: vec![
+                // right animations: 
+                SheetRegion::new(0, 669, 0, 8, 13, 17),
+                SheetRegion::new(0, 669, 19, 8, 12, 17), 
 
+            ], 
+            times: vec![
+                Duration::from_millis(100),
+            ],
+        };
+        let mut animation_state = AnimationState { 
+            current_animation: 0,
+            start_time: 0, 
+            current_time: 0, 
+        };
         Game {
             camera,
             guy,
             guy2,
+            right_animation,
+            animation_state, 
             walls: vec![left_wall, right_wall, floor],
             doors: vec![door],
             apples: Vec::with_capacity(16),
@@ -194,7 +257,7 @@ impl engine::Game for Game {
                 }
             }
         }
-            // copying colission for doors
+            // copying collision for doors
             for _iter in 0..COLLISION_STEPS {
                 // player's collision box
                 let guy_aabb = AABB {
@@ -334,12 +397,15 @@ impl engine::Game for Game {
             .into();
             // TODO animation frame
             uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
+
+            // check here that if down, then down animation
+
             // left
             if engine.input.is_key_down(engine::Key::Left) {
                 uvs[guy_idx] = SheetRegion::new(0, 656, 0, 8, 13, 17);
             }
             if engine.input.is_key_down(engine::Key::Right) {
-                uvs[guy_idx] = SheetRegion::new(0, 669, 0, 8, 13, 17);
+                uvs[guy_idx] = self.right_animation.frames[0];
             }
             if engine.input.is_key_down(engine::Key::Up) {
                 uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);

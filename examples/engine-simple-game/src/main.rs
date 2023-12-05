@@ -125,20 +125,20 @@ impl engine::Game for Game {
             pos: Vec2 { x: 100.0, y: 200.0 },
         };
         let floor_farm = AABB {
-            center: Vec2 { x: W / 2.0, y: 8.0 },
+            center: Vec2 { x: W / 2.0, y: 108.0 },
             size: Vec2 { x: W, y: 16.0 },
         };
         let top_farm = AABB {
-            center: Vec2 { x: W / 2.0, y: H},
+            center: Vec2 { x: W / 2.0, y: H - 108.0},
             size: Vec2 { x: W, y: 16.0 },
         };
         let left_farm = AABB {
-            center: Vec2 { x: 8.0, y: H / 2.0 },
+            center: Vec2 { x: 108.0, y: H / 2.0 },
             size: Vec2 { x: 16.0, y: H },
         };
         let right_farm = AABB {
             center: Vec2 {
-                x: W - 8.0,
+                x: W - 108.0,
                 y: H / 2.0,
             },
             size: Vec2 { x: 16.0, y: H },
@@ -177,8 +177,8 @@ impl engine::Game for Game {
         };
 
         let interior_to_home = Doors {
-            center: Vec2 { x: -300.0, y: -50.0 },
-            size: Vec2 { x: 16.0, y: 16.0 },
+            center: Vec2 { x: -300.0, y: -72.0 },
+            size: Vec2 { x: 25.0, y: 14.0 },
             destination: Vec2{x: 435.0, y: 295.0},
         };
 
@@ -192,12 +192,12 @@ impl engine::Game for Game {
         let forest_to_home = Doors {
             center: Vec2 { x: 367.0, y: 1215.0 },
             size: Vec2 { x: 16.0, y: 28.0 },
-            destination: Vec2{x: 800.0, y: 232.0},
+            destination: Vec2{x: 700.0, y: 232.0},
 
         };
 
         let home_to_forest = Doors {
-            center: Vec2 { x: 820.0, y: 232.0 },
+            center: Vec2 { x: 720.0, y: 232.0 },
             size: Vec2 { x: 16.0, y: 80.0 },
             destination: Vec2{x: 390.0, y: 1215.0},
         };
@@ -371,10 +371,27 @@ impl engine::Game for Game {
                         self.guy.pos.y = door.destination.y;
                         // self.guy.pos.x = 430.0;
                         // self.guy.pos.y = 305.0;
+                    }
 
+                    if self.guy.pos.x > door.center.x {
+                        println!("guy position: {}",self.guy.pos.x);
+                        println!("door center: {}",door.center.x);
+                        self.guy.pos.x = door.destination.x;
+                        self.guy.pos.y = door.destination.y;
+                        // self.guy.pos.x = 430.0;
+                        // self.guy.pos.y = 305.0;
                     }
                     // Guy is below wall, push down
                     if self.guy.pos.y < door.center.y {
+                        println!("guy position: {}",self.guy.pos.x);
+                        println!("door center: {}",door.center.x);
+                        self.guy.pos.x = door.destination.x;
+                        self.guy.pos.y = door.destination.y;
+                        // self.guy.pos.x = 430.0;
+                        // self.guy.pos.y = 330.0;
+                    }
+
+                    if self.guy.pos.y > door.center.y {
                         println!("guy position: {}",self.guy.pos.x);
                         println!("door center: {}",door.center.x);
                         self.guy.pos.x = door.destination.x;
@@ -511,7 +528,7 @@ impl engine::Game for Game {
                     .zip(uvs[door_start..end_of_doors].iter_mut()),
             ) {
                 *trf = (*door).into();
-                *uv = SheetRegion::new(0, 0, 566, 12, 1, 1);
+                *uv = SheetRegion::new(0, 4000, 566, 12, 1, 1);
             }
             trfs[guy2_idx] = AABB {
                 center: self.guy2.pos,

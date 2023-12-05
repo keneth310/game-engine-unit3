@@ -472,7 +472,7 @@ impl engine::Game for Game {
                 *trf = (*wall).into();
                 // handles the region for the walls 
         
-                *uv = SheetRegion::new(0, 0, 566, 12, 1, 1);
+                *uv = SheetRegion::new(0, 0, 4000, 12, 1, 1);
             }
             trfs[guy2_idx] = AABB {
                 center: self.guy2.pos,

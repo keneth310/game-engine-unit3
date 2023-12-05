@@ -6,7 +6,7 @@ use engine_simple::{geom::*, Camera, Engine, SheetRegion, Transform, Zeroable};
 use rand::Rng;
 const W: f32 = 840.0;
 const H: f32 = 620.0;
-const GUY_SPEED: f32 = 2.0;
+const GUY_SPEED: f32 = 5.0;
 const SPRITE_MAX: usize = 16;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
@@ -35,7 +35,7 @@ impl engine::Game for Game {
     fn new(engine: &mut Engine) -> Self {
         let camera = Camera {
             screen_pos: [0.0, 0.0],
-            screen_size: [W / 4.0, H / 4.0],
+            screen_size: [W, H],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {
@@ -94,12 +94,27 @@ impl engine::Game for Game {
             center: Vec2 { x: 220.0, y: 120.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
         };
+// font
+// 012345678
+// 9:;<=>?@A
+// BCDEFGHIJ
+// KLMNOPQRST
+// UVWXYZ[\]^
+// _`abcdefgh
+// ijklmnopqr
+// stuvwxy
+// z
 
+
+        // need to edit the actual spritesheet
         let font = engine::BitFont::with_sheet_region(
-            '0'..='9',
-            SheetRegion::new(0, 0, 512, 0, 80, 8),
-            10,
+            '0'..='z',
+            // orignal 0..9, x:0, y:512. w:80 and h:8
+            // (0, 646, 77, 0, 16, 16)
+            SheetRegion::new(0, 645, 75, 0, 160, 16),
+            9,
         );
+
         Game {
             camera,
             guy,
@@ -261,6 +276,7 @@ impl engine::Game for Game {
                 self.apples.swap_remove(idx);
                 self.score += 1;
             }
+            // keep apples onscreen
             self.apples.retain(|apple| apple.pos.y > -8.0)
         }
         fn render(&mut self, engine: &mut Engine) {
@@ -275,16 +291,22 @@ impl engine::Game for Game {
             }
             .into();
             uvs[0] = SheetRegion::new(0, 823, 0, 16, 420, 310);
-
+            // setting forest
+            // const W: f32 = 840.0;
+            // const H: f32 = 620.0;
             trfs[1] = AABB {
                 center: Vec2 {
                     x: W ,
-                    y: H * 2.0,
+                    y: H * 1.5,
                 },
-                size: Vec2 { x: W, y: H },
+                size: Vec2 { x: 1920.0, y: H },
             }
             .into();
-            uvs[1] = SheetRegion::new(0, 1347, 0, 16, 960, 320);
+
+            uvs[1] = SheetRegion::new(0, 1347, 0, 16, 960, 310);
+            // forest background ^^
+
+
             // set walls
             const WALL_START: usize = 2;
             let guy_idx = WALL_START + self.walls.len();
@@ -345,8 +367,11 @@ impl engine::Game for Game {
             let apple_start = guy_idx + 2 + self.doors.len();
             for (apple, (trf, uv)) in self.apples.iter().zip(
                 trfs[apple_start..]
+                //slice - iter_mut is a method that gives each mutable element
                     .iter_mut()
+                    // takes two iterators and produces new iterators with pairs of elemenets
                     .zip(uvs[apple_start..].iter_mut()),
+                    //zip each apple with sheet region location
             ) {
                 *trf = AABB {
                     center: apple.pos,
@@ -356,7 +381,9 @@ impl engine::Game for Game {
                 *uv = SheetRegion::new(0, 0, 496, 4, 16, 16);
             }
             let sprite_count = apple_start + self.apples.len();
-            let score_str = self.score.to_string();
+            //let score_str = self.score.to_string();
+            let score_str = "abcdefgz";
+            // need to update for new text - immediate engine
             let text_len = score_str.len();
             engine.renderer.sprites.resize_sprite_group(
                 &engine.renderer.gpu,
@@ -367,6 +394,8 @@ impl engine::Game for Game {
                 &mut engine.renderer.sprites,
                 0,
                 sprite_count,
+                // works for whole line
+                // implement line characters, string.split
                 &score_str,
                 Vec2 {
                     x: 16.0,

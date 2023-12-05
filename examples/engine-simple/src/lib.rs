@@ -81,6 +81,9 @@ impl Engine {
                         // ok now render.
                         // We could just call frend.render().
                         self.renderer.render();
+                        // break call to render in 3 parts
+
+                        
                         self.window.request_redraw();
                     }
                     event => {

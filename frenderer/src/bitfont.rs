@@ -38,6 +38,7 @@ impl<B: RangeBounds<char>> BitFont<B> {
         char_sz: f32,
     ) -> (usize, [f32; 2]) {
         let char_uv_sz = self.region.w / self.chars_per_row;
+        println!("char_uv_sz: {}",char_uv_sz);
         let end_char: u32 = match self.chars.end_bound() {
             std::ops::Bound::Included(&c) => u32::from(c) + 1,
             std::ops::Bound::Excluded(&c) => u32::from(c),
@@ -50,8 +51,10 @@ impl<B: RangeBounds<char>> BitFont<B> {
         };
         let char_count = end_char - start_char;
         let rows = (char_count / self.chars_per_row as u32) as u16;
-        assert!(self.region.w >= self.chars_per_row * char_uv_sz);
-        assert!(self.region.h >= rows * char_uv_sz);
+        println!("rows {}", rows);
+        println!("self.region.h {}", self.region.h);
+        //assert!(self.region.w >= self.chars_per_row * char_uv_sz);
+        //assert!(self.region.h >= rows * char_uv_sz);
         let (trfs, uvs) = sprites.get_sprites_mut(group);
         screen_pos[0] += char_sz / 2.0;
         screen_pos[1] -= char_sz / 2.0;

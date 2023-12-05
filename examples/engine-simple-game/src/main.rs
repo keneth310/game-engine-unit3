@@ -88,6 +88,7 @@ impl engine::Game for Game {
     fn new(engine: &mut Engine) -> Self {
         let camera = Camera {
             screen_pos: [0.0, 0.0],
+            // here to zoom
             screen_size: [W, H],
         };
         #[cfg(target_arch = "wasm32")]
@@ -142,27 +143,27 @@ impl engine::Game for Game {
         let interior_to_home = Doors {
             center: Vec2 { x: -300.0, y: -50.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
-            destination: Vec2{x: 430.0, y: 315.0},
+            destination: Vec2{x: 435.0, y: 295.0},
         };
 
         let home_to_interior = Doors {
-            center: Vec2 { x: 400.0, y: 305.0 },
-            size: Vec2 { x: 16.0, y: 16.0 },
+            center: Vec2 { x: 440.0, y: 320.0 },
+            size: Vec2 { x: 16.0, y: 21.0 },
             destination: Vec2{x: -300.0, y: 0.0},
 
         };
         
         let forest_to_home = Doors {
-            center: Vec2 { x: 1200.0, y: 900.0 },
+            center: Vec2 { x: 350.0, y: 1215.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
-            destination: Vec2{x: 430.0, y: 305.0},
+            destination: Vec2{x: 800.0, y: 232.0},
 
         };
 
         let home_to_forest = Doors {
-            center: Vec2 { x: 700.0, y: 400.0 },
-            size: Vec2 { x: 16.0, y: 16.0 },
-            destination: Vec2{x: 1200.0, y: 1200.0},
+            center: Vec2 { x: 820.0, y: 232.0 },
+            size: Vec2 { x: 16.0, y: 80.0 },
+            destination: Vec2{x: 370.0, y: 1215.0},
         };
 
 // font

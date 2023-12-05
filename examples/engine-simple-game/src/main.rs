@@ -8,7 +8,7 @@ use std::time::{Duration, Instant};
 use std::rc::Rc;
 const W: f32 = 840.0;
 const H: f32 = 620.0;
-const GUY_SPEED: f32 = 5.0;
+const GUY_SPEED: f32 = 3.0;
 const SPRITE_MAX: usize = 32;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
@@ -24,7 +24,6 @@ struct Guy {
 
 struct Apple {
     pos: Vec2,
-    vel: Vec2,
 }
 
 struct Game {
@@ -158,7 +157,7 @@ impl engine::Game for Game {
         let guy = Guy {
             pos: Vec2 {
                 x: -300.0,
-                y: 75.0,
+                y: 30.0,
             },
         };
         let guy2 = Guy {
@@ -242,6 +241,43 @@ impl engine::Game for Game {
             destination: Vec2{x: 390.0, y: 1215.0},
         };
 
+        let apple1 = Apple {
+            pos: Vec2 {
+                x: 367.0,
+                y: 1335.0,
+            },
+        };
+        let apple2 = Apple {
+            pos: Vec2 {
+                x: -300.0,
+                y: 0.0,
+            },
+        };
+        let apple3 = Apple {
+            pos: Vec2 {
+                x: 440.0,
+                y: 420.0,
+            },
+        };
+        let apple4 = Apple {
+            pos: Vec2 {
+                x: 500.0,
+                y: 500.0,
+            },
+        };
+        let apple5 = Apple {
+            pos: Vec2 {
+                x: 2000.0,
+                y: 1300.0,
+            },
+        };
+        let apple6 = Apple {
+            pos: Vec2 {
+                x: 1200.0,
+                y: 1200.0,
+            },
+        };
+
 // font
 // 012345678
 // 9:;<=>?@A
@@ -287,7 +323,7 @@ impl engine::Game for Game {
             animation_state, 
             walls: vec![left_farm, right_farm, floor_farm, top_farm, left_forest, right_forest, floor_forest, top_forest, floor_interior, top_interior, right_interior, left_interior], 
             doors: vec![interior_to_home, home_to_interior, forest_to_home, home_to_forest],
-            apples: Vec::with_capacity(16),
+            apples: vec![apple1, apple2, apple3, apple4, apple5, apple6],
             apple_timer: 0,
             score: 0,
             font,
@@ -446,25 +482,21 @@ impl engine::Game for Game {
                 }
             }
 
-            let mut rng = rand::thread_rng();
-            if self.apple_timer > 0 {
-                self.apple_timer -= 1;
-            } else if self.apples.len() < 8 {
-                self.apples.push(Apple {
-                    pos: Vec2 {
-                        x: rng.gen_range(8.0..(W - 8.0)),
-                        y: H + 8.0,
-                    },
-                    vel: Vec2 {
-                        x: 0.0,
-                        y: rng.gen_range((-4.0)..(-1.0)),
-                    },
-                });
-                self.apple_timer = rng.gen_range(30..90);
-            }
+            // let mut rng = rand::thread_rng();
+            // if self.apple_timer > 0 {
+            //     self.apple_timer -= 1;
+            // } else if self.apples.len() < 8 {
+            //     self.apples.push(Apple {
+            //         pos: Vec2 {
+            //             x: rng.gen_range(8.0..(W - 8.0)),
+            //             y: H + 8.0,
+            //         },
+            //     });
+            //     self.apple_timer = rng.gen_range(30..90);
+            // }
             for apple in self.apples.iter_mut() {
-                apple.pos += apple.vel;
             }
+            /// collision with apple: 
             if let Some(idx) = self
                 .apples
                 .iter()
@@ -612,7 +644,7 @@ impl engine::Game for Game {
             }
             let sprite_count = apple_start + self.apples.len();
             //let score_str = self.score.to_string();
-            let score_str = "abcdefgz";
+            let score_str = self.score.to_string();
             // need to update for new text - immediate engine
             let text_len = score_str.len();
             engine.renderer.sprites.resize_sprite_group(

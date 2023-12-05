@@ -14,7 +14,7 @@ struct Guy {
     pos: Vec2,
 }
 
-struct Apple {
+struct Asteroid {
     pos: Vec2,
     vel: Vec2,
 }
@@ -23,9 +23,9 @@ struct Game {
     camera: engine::Camera,
     walls: Vec<AABB>,
     guy: Guy,
-    apples: Vec<Apple>,
-    apple_timer: u32,
-    score: u32,
+    asteroids: Vec<Asteroid>,
+    asteroid_timer: u32,
+    lives: u32,
     font: engine_simple::BitFont,
 }
 
@@ -62,14 +62,14 @@ impl engine::Game for Game {
         // engine.renderer.sprites.add_sprite_group(
         //     &engine.renderer.gpu,
         //     &sprite_tex,
-        //     vec![Transform::zeroed(); SPRITE_MAX], //bg, three walls, guy, a few apples
+        //     vec![Transform::zeroed(); SPRITE_MAX], //bg, three walls, guy, a few asteroids
         //     vec![SheetRegion::zeroed(); SPRITE_MAX],
         //     camera,
         // );
         engine.renderer.sprites.add_sprite_group(
             &engine.renderer.gpu,
             &sprite_tex_2,
-            vec![Transform::zeroed(); SPRITE_MAX], //bg, three walls, guy, a few apples
+            vec![Transform::zeroed(); SPRITE_MAX], //bg, three walls, guy, a few asteroids
             vec![SheetRegion::zeroed(); SPRITE_MAX],
             camera,
         );
@@ -104,9 +104,9 @@ impl engine::Game for Game {
             camera,
             guy,
             walls: vec![left_wall, right_wall, floor],
-            apples: Vec::with_capacity(16),
-            apple_timer: 0,
-            score: 0,
+            asteroids: Vec::with_capacity(16),
+            asteroid_timer: 0,
+            lives: 3,
             font,
         }
     }
@@ -167,33 +167,34 @@ impl engine::Game for Game {
             }
         }
         let mut rng = rand::thread_rng();
-        if self.apple_timer > 0 {
-            self.apple_timer -= 1;
-        } else if self.apples.len() < 8 {
-            self.apples.push(Apple {
+        if self.asteroid_timer > 0 {
+            self.asteroid_timer -= 1;
+        } else if self.asteroids.len() < 15 {
+            self.asteroids.push(Asteroid {
                 pos: Vec2 {
                     x: rng.gen_range(8.0..(W - 8.0)),
                     y: H + 8.0,
                 },
                 vel: Vec2 {
                     x: 0.0,
-                    y: rng.gen_range((-4.0)..(-1.0)),
+                    y: -5.0,
+                    //y: rng.gen_range((-4.0)..(-1.0)),
                 },
             });
-            self.apple_timer = rng.gen_range(30..90);
+            self.asteroid_timer = rng.gen_range(30..90);
         }
-        for apple in self.apples.iter_mut() {
-            apple.pos += apple.vel;
+        for asteroid in self.asteroids.iter_mut() {
+            asteroid.pos += asteroid.vel;
         }
         if let Some(idx) = self
-            .apples
+            .asteroids
             .iter()
-            .position(|apple| apple.pos.distance(self.guy.pos) <= CATCH_DISTANCE)
+            .position(|asteroid| asteroid.pos.distance(self.guy.pos) <= CATCH_DISTANCE)
         {
-            self.apples.swap_remove(idx);
-            self.score += 1;
+            self.asteroids.swap_remove(idx);
+            self.lives -= 1;
         }
-        self.apples.retain(|apple| apple.pos.y > -8.0)
+        self.asteroids.retain(|asteroid| asteroid.pos.y > -8.0)
     }
     fn render(&mut self, engine: &mut Engine) {
         // set bg image
@@ -226,23 +227,23 @@ impl engine::Game for Game {
         .into();
         // TODO animation frame
         uvs[guy_idx] = SheetRegion::new(0, 2480, 0, 8, 207, 206);
-        // set apple
-        let apple_start = guy_idx + 1;
-        for (apple, (trf, uv)) in self.apples.iter().zip(
-            trfs[apple_start..]
+        // set asteroids
+        let asteroid_start = guy_idx + 1;
+        for (asteroid, (trf, uv)) in self.asteroids.iter().zip(
+            trfs[asteroid_start..]
                 .iter_mut()
-                .zip(uvs[apple_start..].iter_mut()),
+                .zip(uvs[asteroid_start..].iter_mut()),
         ) {
             *trf = AABB {
-                center: apple.pos,
+                center: asteroid.pos,
                 size: Vec2 { x: 16.0, y: 16.0 },
             }
             .into();
-            *uv = SheetRegion::new(0, 0, 496, 4, 16, 16);
+            *uv = SheetRegion::new(0, 0, 1622, 4, 16, 15);
         }
-        let sprite_count = apple_start + self.apples.len();
-        let score_str = self.score.to_string();
-        let text_len = score_str.len();
+        let sprite_count = asteroid_start + self.asteroids.len();
+        let lives_str = self.lives.to_string();
+        let text_len = lives_str.len();
         engine.renderer.sprites.resize_sprite_group(
             &engine.renderer.gpu,
             0,
@@ -252,7 +253,7 @@ impl engine::Game for Game {
             &mut engine.renderer.sprites,
             0,
             sprite_count,
-            &score_str,
+            &lives_str,
             Vec2 {
                 x: 16.0,
                 y: H - 16.0,

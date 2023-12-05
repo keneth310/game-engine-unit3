@@ -116,8 +116,8 @@ impl engine::Game for Game {
 
         let guy = Guy {
             pos: Vec2 {
-                x: 150.0,
-                y: 100.0,
+                x: -300.0,
+                y: 75.0,
             },
         };
         let guy2 = Guy {
@@ -140,29 +140,29 @@ impl engine::Game for Game {
         };
 
         let interior_to_home = Doors {
-            center: Vec2 { x: -100.0, y: -100.0 },
+            center: Vec2 { x: -300.0, y: -50.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
-            destination: Vec2{x: 430.0, y: 305.0},
+            destination: Vec2{x: 430.0, y: 315.0},
         };
 
         let home_to_interior = Doors {
-            center: Vec2 { x: 400.0, y: 120.0 },
+            center: Vec2 { x: 400.0, y: 305.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
-            destination: Vec2{x: 430.0, y: 305.0},
+            destination: Vec2{x: -300.0, y: 0.0},
 
         };
         
         let forest_to_home = Doors {
-            center: Vec2 { x: 600.0, y: 120.0 },
+            center: Vec2 { x: 1200.0, y: 900.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
             destination: Vec2{x: 430.0, y: 305.0},
 
         };
 
         let home_to_forest = Doors {
-            center: Vec2 { x: 700.0, y: 120.0 },
+            center: Vec2 { x: 700.0, y: 400.0 },
             size: Vec2 { x: 16.0, y: 16.0 },
-            destination: Vec2{x: 430.0, y: 305.0},
+            destination: Vec2{x: 1200.0, y: 1200.0},
         };
 
 // font

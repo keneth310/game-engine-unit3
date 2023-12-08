@@ -24,6 +24,8 @@ struct Game {
     walls: Vec<AABB>,
     vertical_screen: f32,
     scrolling_screen: f32,
+    screen_buffer: bool,
+    screens_loaded: f32,
     guy: Guy,
     asteroids: Vec<Asteroid>,
     asteroid_timer: u32,
@@ -38,7 +40,7 @@ impl engine::Game for Game {
             screen_pos: [0.0, 0.0],
             //screen_pos: [-320.0, -640.0],
             // Zoom
-            screen_size: [W*3.0, H*3.0],
+            screen_size: [W*1.0, H*1.0],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {
@@ -110,6 +112,8 @@ impl engine::Game for Game {
             guy,
             vertical_screen: 1.0,
             scrolling_screen: 1.0,
+            screen_buffer: true,
+            screens_loaded: 1.0,
             walls: vec![left_wall, right_wall, floor],
             asteroids: Vec::with_capacity(25),
             asteroid_timer: 0,
@@ -206,16 +210,31 @@ impl engine::Game for Game {
     fn render(&mut self, engine: &mut Engine) {
 
         // scrolling camera code
-        self.camera.screen_pos[1] += 5.0;
+        self.camera.screen_pos[1] += 10.0;
         println!("{}", self.camera.screen_pos[1]);
-        if (self.camera.screen_pos[1] as usize % 320 == 0 && self.camera.screen_pos[1] > 0.0){
-            self.vertical_screen += 1.0;
+        println!("WERID MATH = {}", ((320.0 * self.screens_loaded) as usize));
+        // once you hit the thresehold approaching end of first sreen
+        if (self.screen_buffer && (self.camera.screen_pos[1] + 320.0) as usize % ((320.0 * self.screens_loaded) as usize) == 0){
             println!("YOU JUST HIT THE SCROLLING THRESHOLD");
+            self.vertical_screen += 4.0;
+            self.screens_loaded += 1.0;
+            self.screen_buffer = false;
+        } else if (self.camera.screen_pos[1] as usize % ((640.0 * self.screens_loaded) as usize) == 0){
+            self.scrolling_screen += 4.0;
+            println!("222222222222222222222222D");
+            // was one when almost worked
+            self.screens_loaded += 1.0;
+            self.screen_buffer = true;
         }
-        if (self.camera.screen_pos[1] as usize % 640 == 0 && self.camera.screen_pos[1] > 0.0){
-            self.scrolling_screen += 2.0;
-            println!("YOU JUST HIT THE SCROLLING THRESHOLD");
-        }
+        // println!("{}", self.camera.screen_pos[1]);
+        // if (self.camera.screen_pos[1] as usize % 320 == 0 && self.camera.screen_pos[1] > 0.0){
+        //     self.vertical_screen += 1.0;
+        //     println!("YOU JUST HIT THE SCROLLING THRESHOLD");
+        // }
+        // if (self.camera.screen_pos[1] as usize % 640 == 0 && self.camera.screen_pos[1] > 0.0){
+        //     self.scrolling_screen += 2.0;
+        //     println!("YOU JUST HIT THE SCROLLING THRESHOLD");
+        // }
         // // //
         // SET BG IMAGES
         let (trfs, uvs) = engine.renderer.sprites.get_sprites_mut(0);
@@ -223,6 +242,7 @@ impl engine::Game for Game {
             center: Vec2 {
                 x: W / 2.0,
                 y: (H / 2.0) * self.scrolling_screen,
+                //y: 320.0,
             },
             size: Vec2 { x: W, y: H * 2.0 },
         }
@@ -232,13 +252,14 @@ impl engine::Game for Game {
         trfs[1] = AABB {
             center: Vec2 {
                 x: W / 2.0,
+                //y: H+640.0,
                 y: (H / 2.0) * self.vertical_screen,
             },
             size: Vec2 { x: W, y: H * 2.0 },
         }
         .into();
     
-        uvs[1] = SheetRegion::new(0, 0, 1749, 16, 160, 640);
+        uvs[1] = SheetRegion::new(0, 0, 1747, 16, 160, 640);
 
         // trfs[2] = AABB {
         //     center: Vec2 {

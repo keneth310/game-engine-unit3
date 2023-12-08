@@ -7,7 +7,7 @@ use rand::Rng;
 const W: f32 = 320.0;
 const H: f32 = 640.0;
 const GUY_SPEED: f32 = 4.0;
-const BULLET_SPEED: f32 = 48.0;
+const BULLET_SPEED: f32 = 28.0;
 const SPRITE_MAX: usize = 32;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
@@ -122,7 +122,7 @@ impl engine::Game for Game {
             asteroids: Vec::with_capacity(25),
             bullets: Vec::with_capacity(25),
             asteroid_timer: 0,
-            lives: 30,
+            lives: 5,
             font,
             accumulator: 0.0,
         }
@@ -137,7 +137,7 @@ impl engine::Game for Game {
         for _iter in 0..COLLISION_STEPS {
             let guy_aabb = AABB {
                 center: self.guy.pos,
-                size: Vec2 { x: 16.0, y: 16.0 },
+                size: Vec2 { x: 16.0, y: 1.0 },
             };
             contacts.clear();
             // TODO: to generalize to multiple guys, need to iterate over guys first and have guy_index, rect_index, displacement in a contact tuple
@@ -188,7 +188,7 @@ impl engine::Game for Game {
         //
         // 
         //
-        // timer logic for shooting
+        //timer logic for shooting
         if shooting {
             self.bullets.push(Asteroid {
                 pos: Vec2 {
@@ -209,42 +209,24 @@ impl engine::Game for Game {
         //
         //
         //
-
-        // timer logic for asteroids
-        let mut rng = rand::thread_rng();
-        if self.asteroid_timer > 0 {
-            self.asteroid_timer -= 1;
-        } else if self.asteroids.len() < 25 {
-            self.asteroids.push(Asteroid {
-                pos: Vec2 {
-                    x: rng.gen_range(8.0..(W - 8.0)),
-                    y: H + 8.0,
-                },
-                vel: Vec2 {
-                    x: rng.gen_range((-4.0)..(4.0)),
-                    y: -1.0,
-                    //y: -25.0,
-                    //y: rng.gen_range((-4.0)..(-1.0)),
-                },
-            });
-            self.asteroid_timer = 15;
-        }
-        for asteroid in self.asteroids.iter_mut() {
-            asteroid.pos += asteroid.vel;
-        }
-        // COLLISION FOR ASTEROIDS
-        if let Some(idx) = self
-            .asteroids
-            .iter()
-            .position(|asteroid| asteroid.pos.distance(self.guy.pos) <= CATCH_DISTANCE)
-        {
-            self.asteroids.swap_remove(idx);
-            self.lives -= 1;
-        }
-        self.asteroids.retain(|asteroid| asteroid.pos.y > -8.0);
-
         // // // // // // //
         // collisions for bullets
+        // for bullets in self.bullets.iter_mut() {
+        //     let mut hit = false; // Flag to check if an asteroid was hit
+        
+        //     if let Some(idx) = self.asteroids.iter().position(|asteroid| asteroid.pos.distance(bullets.pos) <= CATCH_DISTANCE) {
+        //         self.asteroids.swap_remove(idx);
+        //         println!("HIIIIIIITTTTTT!!!!");
+        //         hit = true;
+        //     }
+        //     // If an asteroid was hit, break the loop to restart from the beginning
+        //     if hit {
+        //         continue;
+        //     } else{
+        //         self.asteroids.retain(|asteroid| asteroid.pos.y + self.accumulator > -8.0 + self.accumulator);
+        //     }
+            
+        // }
         for bullets in self.bullets.iter_mut() {
             if let Some(idx) = self
                 .asteroids
@@ -254,20 +236,85 @@ impl engine::Game for Game {
                 self.asteroids.swap_remove(idx);
                 println!("HIIIIIIITTTTTT!!!!");
                 }
+                self.asteroids.retain(|asteroid| asteroid.pos.y + self.accumulator > -8.0 + self.accumulator);
         }
-
         // // // // // // //
+        // timer logic for asteroids
+        // let mut rng = rand::thread_rng();
+        // if self.asteroid_timer > 0 {
+        //     self.asteroid_timer -= 1;
+        // } else if self.asteroids.len() < 25 {
+        //     self.asteroids.push(Asteroid {
+        //         pos: Vec2 {
+        //             x: rng.gen_range(8.0..(W - 8.0)),
+        //             y: H + 8.0,
+        //         },
+        //         vel: Vec2 {
+        //             x: rng.gen_range((-4.0)..(4.0)),
+        //             //y: -1.0,
+        //             y: -25.0,
+        //             //y: rng.gen_range((-4.0)..(-1.0)),
+        //         },
+        //     });
+        //     self.asteroid_timer = 15;
+        // }
+        // for asteroid in self.asteroids.iter_mut() {
+        //     asteroid.pos += asteroid.vel;
+        // }
+        // // COLLISION FOR ASTEROIDS
+        // if let Some(idx) = self
+        //     .asteroids
+        //     .iter()
+        //     .position(|asteroid| asteroid.pos.distance(self.guy.pos) <= CATCH_DISTANCE)
+        // {
+        //     self.asteroids.swap_remove(idx);
+        //     self.lives -= 1;
+        // }
+        // self.asteroids.retain(|asteroid| asteroid.pos.y > -8.0);
+
+        let mut rng = rand::thread_rng();
+        if self.asteroid_timer > 0 {
+            self.asteroid_timer -= 1;
+        } else if self.asteroids.len() < 25 {
+            self.asteroids.push(Asteroid {
+                pos: Vec2 {
+                    x: rng.gen_range(8.0..(W - 8.0)),
+                    y: H + 8.0 + self.accumulator,
+                },
+                vel: Vec2 {
+                    x: rng.gen_range((-2.0)..(2.0)),
+                    //y: -15.0,
+                    y: rng.gen_range((-4.0)..(-0.5)),
+                },
+            });
+            self.asteroid_timer = 30;
+        }
+        for asteroid in self.asteroids.iter_mut() {
+            asteroid.pos += asteroid.vel;
+        }
+        if let Some(idx) = self
+            .asteroids
+            .iter()
+            .position(|asteroid| asteroid.pos.distance(self.guy.pos) <= CATCH_DISTANCE)
+        {
+            self.asteroids.swap_remove(idx);
+            self.lives -= 1;
+        }
+        self.asteroids.retain(|asteroid| asteroid.pos.y + self.accumulator > -8.0 + self.accumulator)
+
+
+
+
 
     }
     fn render(&mut self, engine: &mut Engine) {
 
         // scrolling camera code
         // self.camera.screen_pos[1] += 1.0;
-        self.camera.screen_pos[1] += SCROLL_SPEED;
+        self.camera.screen_pos[1] += (SCROLL_SPEED);
         self.guy.pos.y += SCROLL_SPEED;
-
         // camera following ship slowly
-        // in 400 x 600 resolution, this V slows horizontal scrolling -->                         offset so you start in center
+        // in 400 x 600 resolution, this V slows horizontal scrolling -->          offset so you start in center
         self.camera.screen_pos[0] = (self.guy.pos.x / 2.0) - (self.camera.screen_size[0] / 2.0) + 80.0;
 
         // infinite background code
@@ -403,7 +450,7 @@ impl engine::Game for Game {
         // add this to the ateroids pos val
         self.accumulator += SCROLL_SPEED;
         // set asteroids
-        let asteroid_start = bullet_end;
+        let asteroid_start = bullet_end + 1;
         for (asteroid, (trf, uv)) in self.asteroids.iter().zip(
             trfs[asteroid_start..]
                 .iter_mut()
@@ -411,12 +458,19 @@ impl engine::Game for Game {
         ) {
             //println!("ASTEROID acumulator: {}", self.accumulator);
             *trf = AABB {
-                center: Vec2 { x: asteroid.pos.x, y: asteroid.pos.y + self.accumulator},
+                center: Vec2 { x: asteroid.pos.x, y: asteroid.pos.y },
                 size: Vec2 { x: 16.0, y: 16.0 },
             }
             .into();
             *uv = SheetRegion::new(0, 0, 1622, 4, 16, 15);
         }
+
+        // boost y valie of asteroids
+        for element in self.asteroids.iter_mut() {
+            element.pos[1] += SCROLL_SPEED;
+            println!("{}", element.pos[1]);
+
+        } 
 
         let sprite_count = asteroid_start + self.asteroids.len();
         let lives_str = self.lives.to_string();

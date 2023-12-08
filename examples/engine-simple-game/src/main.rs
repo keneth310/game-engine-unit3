@@ -34,6 +34,9 @@ struct Game {
     guy: Guy,
     guy2: Guy,
     right_animation: Animation, 
+    left_animation: Animation,
+    up_animation: Animation, 
+    down_animation: Animation,
     animation_state: AnimationState,
     apples: Vec<Apple>,
     apple_timer: u32,
@@ -72,28 +75,6 @@ impl Animation {
             println!("YOOOOOOOO");
             animation_state.start_time = Instant::now();
         }
-        // // for (i = 0, < # of frames in vec of frames)
-        // for(i, &times) in self.times.iter().enumerate() {
-        //     println!("Elapsed time before adding to accumulate: {}", elapsed_time);
-        //     accumulated_time += elapsed_time;
-        //     // if accumulated time has exceeded current duration of frame
-        //     if (now.as_millis() < accumulated_time){
-        //         current_frame+=1;
-        //         // reset counter
-        //         //accumulated_time = accumulated_time % times.as_millis();
-        //         println!("Elapsed time before resetting timer: {}", elapsed_time);
-        //     }
-        //     else {
-        //         current_frame = 0;
-        //         now = Instant::now();
-        //     }
-        //     // loop to beginning of array of franes
-        //     if (i == self.frames.len()){
-        //         current_frame = 0;
-        //         println!("HIT LENGTH OF FRAME{}", elapsed_time);
-        //     }
-        //     break;
-        // }
 
         // // Return the frame to be displayed
         println!("return frame index: {}", animation_state.current_frame);
@@ -265,17 +246,6 @@ impl engine::Game for Game {
             },
         };
 
-// font
-// 012345678
-// 9:;<=>?@A
-// BCDEFGHIJ
-// KLMNOPQRST
-// UVWXYZ[\]^
-// _`abcdefgh
-// ijklmnopqr
-// stuvwxy
-// z
-
         // need to edit the actual spritesheet
         let font = engine::BitFont::with_sheet_region(
             '0'..='z',
@@ -287,17 +257,58 @@ impl engine::Game for Game {
         let mut right_animation = Animation { 
             frames: vec![
                 // right animations: 
-                SheetRegion::new(0, 669, 0, 8, 13, 17),
+                SheetRegion::new(0, 669, 0, 8, 11, 17),
                 SheetRegion::new(0, 669, 19, 8, 12, 17), 
 
             ], 
             times: vec![
-                Duration::from_millis(250),
-                Duration::from_millis(250),
+                Duration::from_millis(225),
+                Duration::from_millis(225),
+            ],
+        };
+        let left_animation = Animation { 
+            frames: vec![
+                // right animations: 
+                SheetRegion::new(0, 656, 0, 8, 11, 17),
+                SheetRegion::new(0, 654, 19, 8, 13, 17),
+
+
+            ], 
+            times: vec![
+                Duration::from_millis(225),
+                Duration::from_millis(225),
+            ],
+        };
+        let up_animation = Animation { 
+            frames: vec![
+                SheetRegion::new(0, 682, 0, 8, 13, 17),
+                SheetRegion::new(0, 682, 18, 8, 13, 17),
+                SheetRegion::new(0, 682, 38, 8, 13, 17),
+
+
+
+            ], 
+            times: vec![
+                Duration::from_millis(225),
+                Duration::from_millis(225),
+                Duration::from_millis(225),
+            ],
+        };
+        let down_animation = Animation { 
+            frames: vec![
+                SheetRegion::new(0, 641, 0, 8, 13, 17),
+                SheetRegion::new(0, 641, 19, 8, 13, 17),
+                SheetRegion::new(0, 641, 38, 8, 13, 17),
+
+            ], 
+            times: vec![
+                Duration::from_millis(225),
+                Duration::from_millis(225),
+                Duration::from_millis(225),
             ],
         };
 
-        let mut animation_state = AnimationState { 
+        let animation_state = AnimationState { 
             // starts at 0
             current_animation: 0,
             current_frame: 0, 
@@ -309,6 +320,9 @@ impl engine::Game for Game {
             guy,
             guy2,
             right_animation,
+            left_animation,
+            up_animation, 
+            down_animation,
             animation_state, 
             walls: vec![left_farm, right_farm, floor_farm, top_farm, left_forest, right_forest, floor_forest, top_forest, floor_interior, top_interior, right_interior, left_interior], 
             doors: vec![interior_to_home, home_to_interior, forest_to_home, home_to_forest],
@@ -574,24 +588,21 @@ impl engine::Game for Game {
 
             // down
             if engine.input.is_key_down(engine::Key::Down) {
-                uvs[guy_idx] = SheetRegion::new(0, 641, 0, 8, 13, 17);
+                uvs[guy_idx] = *self.down_animation.get_current_frame(&mut self.animation_state);
             }
 
             // up
             if engine.input.is_key_down(engine::Key::Up) {
-                uvs[guy_idx] = SheetRegion::new(0, 682, 0, 8, 13, 17);
+                uvs[guy_idx] = *self.up_animation.get_current_frame(&mut self.animation_state);
             }
 
             
             // left
             if engine.input.is_key_down(engine::Key::Left) {
-                uvs[guy_idx] = SheetRegion::new(0, 656, 0, 8, 13, 17);
+                uvs[guy_idx] = *self.left_animation.get_current_frame(&mut self.animation_state);
             }
-            // check here that if down, then down animation
+            // right
             if engine.input.is_key_down(engine::Key::Right) {
-                //  start keeping track of time by flipping the animation_State flag
-
-                // 3 paramters; (start_Time, now(current time), speedup factor)
                 uvs[guy_idx] = *self.right_animation.get_current_frame(&mut self.animation_state);
             }
 

@@ -22,6 +22,8 @@ struct Asteroid {
 struct Game {
     camera: engine::Camera,
     walls: Vec<AABB>,
+    vertical_screen: f32,
+    scrolling_screen: f32,
     guy: Guy,
     asteroids: Vec<Asteroid>,
     asteroid_timer: u32,
@@ -32,8 +34,11 @@ struct Game {
 impl engine::Game for Game {
     fn new(engine: &mut Engine) -> Self {
         let camera = Camera {
+            // was zero
             screen_pos: [0.0, 0.0],
-            screen_size: [W, H],
+            //screen_pos: [-320.0, -640.0],
+            // Zoom
+            screen_size: [W*3.0, H*3.0],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {
@@ -103,10 +108,12 @@ impl engine::Game for Game {
         Game {
             camera,
             guy,
+            vertical_screen: 1.0,
+            scrolling_screen: 1.0,
             walls: vec![left_wall, right_wall, floor],
             asteroids: Vec::with_capacity(25),
             asteroid_timer: 0,
-            lives: 3,
+            lives: 30,
             font,
         }
     }
@@ -197,19 +204,57 @@ impl engine::Game for Game {
         self.asteroids.retain(|asteroid| asteroid.pos.y > -8.0)
     }
     fn render(&mut self, engine: &mut Engine) {
-        // set bg image
+
+        // scrolling camera code
+        self.camera.screen_pos[1] += 5.0;
+        println!("{}", self.camera.screen_pos[1]);
+        if (self.camera.screen_pos[1] as usize % 320 == 0 && self.camera.screen_pos[1] > 0.0){
+            self.vertical_screen += 1.0;
+            println!("YOU JUST HIT THE SCROLLING THRESHOLD");
+        }
+        if (self.camera.screen_pos[1] as usize % 640 == 0 && self.camera.screen_pos[1] > 0.0){
+            self.scrolling_screen += 2.0;
+            println!("YOU JUST HIT THE SCROLLING THRESHOLD");
+        }
+        // // //
+        // SET BG IMAGES
         let (trfs, uvs) = engine.renderer.sprites.get_sprites_mut(0);
         trfs[0] = AABB {
             center: Vec2 {
                 x: W / 2.0,
-                y: H / 2.0,
+                y: (H / 2.0) * self.scrolling_screen,
             },
-            size: Vec2 { x: W, y: H },
+            size: Vec2 { x: W, y: H * 2.0 },
         }
         .into();
         uvs[0] = SheetRegion::new(0, 0, 1749, 16, 160, 640);
+
+        trfs[1] = AABB {
+            center: Vec2 {
+                x: W / 2.0,
+                y: (H / 2.0) * self.vertical_screen,
+            },
+            size: Vec2 { x: W, y: H * 2.0 },
+        }
+        .into();
+    
+        uvs[1] = SheetRegion::new(0, 0, 1749, 16, 160, 640);
+
+        // trfs[2] = AABB {
+        //     center: Vec2 {
+        //         x: W + 160.0,
+        //         y: H / 2.0,
+        //     },
+        //     size: Vec2 { x: W, y: H * 2.0 },
+        // }
+        // .into();
+        // uvs[2] = SheetRegion::new(0, 0, 1749, 16, 160, 640);
+
+        ///////        ///////        ///////        ///////        ///////
+
+
         // set walls
-        const WALL_START: usize = 1;
+        const WALL_START: usize = 3;
         let guy_idx = WALL_START + self.walls.len();
         for (wall, (trf, uv)) in self.walls.iter().zip(
             trfs[WALL_START..guy_idx]
@@ -217,7 +262,7 @@ impl engine::Game for Game {
                 .zip(uvs[WALL_START..guy_idx].iter_mut()),
         ) {
             *trf = (*wall).into();
-            *uv = SheetRegion::new(0, 0, 4000, 12, 8, 8);
+            *uv = SheetRegion::new(0, 0, 0, 12, 8, 8);
         }
         // set guy
         trfs[guy_idx] = AABB {
@@ -272,5 +317,5 @@ impl engine::Game for Game {
     }
 }
 fn main() {
-    Engine::new(winit::window::WindowBuilder::new().with_inner_size(winit::dpi::LogicalSize::new(400,800))).run::<Game>();
+    Engine::new(winit::window::WindowBuilder::new().with_inner_size(winit::dpi::LogicalSize::new(400,600))).run::<Game>();
 }

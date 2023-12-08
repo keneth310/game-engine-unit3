@@ -12,7 +12,6 @@ const SPRITE_MAX: usize = 32;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
 const SCROLL_SPEED: f32 = 1.0;
-const accumulator: f32 = H + 8.0;
 struct Guy {
     pos: Vec2,
 }
@@ -45,7 +44,7 @@ impl engine::Game for Game {
             screen_pos: [0.0, 0.0],
             //screen_pos: [-320.0, -640.0],
             // Zoom, play in W and H = 1.0
-            screen_size: [W*1.0, H*1.0],
+            screen_size: [W*3.0, H*3.0],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {
@@ -203,6 +202,7 @@ impl engine::Game for Game {
             });
         }
         for bullets in self.bullets.iter_mut() {
+            // add vertical velocity to bullets
             bullets.pos += bullets.vel;
         }
         //
@@ -222,7 +222,8 @@ impl engine::Game for Game {
                 },
                 vel: Vec2 {
                     x: rng.gen_range((-4.0)..(4.0)),
-                    y: -25.0,
+                    y: -1.0,
+                    //y: -25.0,
                     //y: rng.gen_range((-4.0)..(-1.0)),
                 },
             });
@@ -242,7 +243,20 @@ impl engine::Game for Game {
         }
         self.asteroids.retain(|asteroid| asteroid.pos.y > -8.0);
 
+        // // // // // // //
         // collisions for bullets
+        for bullets in self.bullets.iter_mut() {
+            if let Some(idx) = self
+                .asteroids
+                .iter()
+                .position(|asteroid| asteroid.pos.distance(bullets.pos) <= CATCH_DISTANCE)
+                {
+                self.asteroids.swap_remove(idx);
+                println!("HIIIIIIITTTTTT!!!!");
+                }
+        }
+
+        // // // // // // //
 
     }
     fn render(&mut self, engine: &mut Engine) {
@@ -395,7 +409,7 @@ impl engine::Game for Game {
                 .iter_mut()
                 .zip(uvs[asteroid_start..].iter_mut()),
         ) {
-            println!("ASTEROID acumulator: {}", self.accumulator);
+            //println!("ASTEROID acumulator: {}", self.accumulator);
             *trf = AABB {
                 center: Vec2 { x: asteroid.pos.x, y: asteroid.pos.y + self.accumulator},
                 size: Vec2 { x: 16.0, y: 16.0 },

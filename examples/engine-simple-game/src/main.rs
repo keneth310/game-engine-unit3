@@ -58,17 +58,19 @@ impl Animation {
         // Calculate elapsed time
         println!("Time at beginning function call: {:?}", animation_state.start_time.elapsed());
         // check if at end of list of animation frames
-        println!("{}", self.frames.len()-1);
-        if animation_state.current_frame > 1{
-            animation_state.current_frame = 0;
-            println!("YOOOOOOOO");
-            animation_state.start_time = Instant::now();
-        }
         println!("Animation Current Frame: {}", animation_state.current_frame);
 
         if animation_state.start_time.elapsed() > self.times[animation_state.current_frame]{
             animation_state.current_frame += 1;
             animation_state.start_flag = true;
+        }
+
+
+        println!("{}", self.frames.len()-1);
+        if animation_state.current_frame > 1{
+            animation_state.current_frame = 0;
+            println!("YOOOOOOOO");
+            animation_state.start_time = Instant::now();
         }
         // // for (i = 0, < # of frames in vec of frames)
         // for(i, &times) in self.times.iter().enumerate() {

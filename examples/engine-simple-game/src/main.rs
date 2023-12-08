@@ -4,6 +4,7 @@ use engine_simple as engine;
 use engine_simple::wgpu;
 use engine_simple::{geom::*, Camera, Engine, SheetRegion, Transform, Zeroable};
 use rand::Rng;
+use std::thread::current;
 use std::time::{Duration, Instant};
 use std::rc::Rc;
 const W: f32 = 840.0;
@@ -47,79 +48,63 @@ pub struct Animation {
 
 impl Animation {
 
-    // getCurrent_frame
-    // spritesheet has 2 regions
-    // elapsed time
-
-
     // Function to sample the animation at a given time
-    fn get_current_frame(&self, start_time: usize, now: usize, speedup_factor: usize) -> &SheetRegion {
-        // Calculate elapsed time
-        let now = Instant::now();
-        let elapsed_time = now.elapsed().as_millis();
-        println!("Time at beginning function call: {}", elapsed_time);
-
-        //let elapsed_time = (now - start_time) * speedup_factor;
-        // Determine the current frame based on elapsed time
-        let mut current_frame = 0;
-        let mut accumulated_time: u128 = 0;
-        // for (i = 0, < # of frames in vec of frames)
-        for(i, &times) in self.times.iter().enumerate() {
-            println!("Elapsed time before adding to accumulate: {}", elapsed_time);
-            accumulated_time += elapsed_time;
-            // if accumulated time has exceeded current duration of frame
-            if (times.as_millis() < accumulated_time){
-                current_frame+=1;
-                // reset counter
-                //accumulated_time = accumulated_time % times.as_millis();
-                println!("Elapsed time before resetting timer: {}", elapsed_time);
-                let now = Instant::now();
-            }
-            // loop to beginning of array of franes
-            if (i == self.frames.len()){
-                current_frame = 0;
-                println!("Elapsed time before resestting to first frame: {}", elapsed_time);
-                let now = Instant::now();
-            }
-            break;
+    fn get_current_frame(&self, animation_state: &mut AnimationState) -> &SheetRegion {
+        if animation_state.start_flag{
+            animation_state.start_flag = false;
+            animation_state.start_time = Instant::now();
         }
 
-        // if i < len(frames), i = 0
-        // for (i, &frame_duration) in self.times.iter().enumerate() {
-        //     // print current frame_duration
-        //     println!("Current frame duration: {}", frame_duration[i]);
-        //     // add elapsed time to accumulated frame
-        //     accumulated_time += elapsed_time as usize;
-        //     if  frame_duration < accumulated_time {
-        //         current_frame += 1;
-        //         println!("{}", current_frame);
-        //         // loops if animation is at end of animation vector
-        //         if (i == self.frames.len()){
-        //             current_frame = 0;
-        //         }
-        //         break;
+        // Calculate elapsed time
+        println!("Time at beginning function call: {:?}", animation_state.start_time.elapsed());
+        // check if at end of list of animation frames
+        println!("{}", self.frames.len()-1);
+        if animation_state.current_frame > 1{
+            animation_state.current_frame = 0;
+            println!("YOOOOOOOO");
+            animation_state.start_time = Instant::now();
+        }
+        println!("Animation Current Frame: {}", animation_state.current_frame);
+
+        if animation_state.start_time.elapsed() > self.times[animation_state.current_frame]{
+            animation_state.current_frame += 1;
+            animation_state.start_flag = true;
+        }
+        // // for (i = 0, < # of frames in vec of frames)
+        // for(i, &times) in self.times.iter().enumerate() {
+        //     println!("Elapsed time before adding to accumulate: {}", elapsed_time);
+        //     accumulated_time += elapsed_time;
+        //     // if accumulated time has exceeded current duration of frame
+        //     if (now.as_millis() < accumulated_time){
+        //         current_frame+=1;
+        //         // reset counter
+        //         //accumulated_time = accumulated_time % times.as_millis();
+        //         println!("Elapsed time before resetting timer: {}", elapsed_time);
         //     }
+        //     else {
+        //         current_frame = 0;
+        //         now = Instant::now();
+        //     }
+        //     // loop to beginning of array of franes
+        //     if (i == self.frames.len()){
+        //         current_frame = 0;
+        //         println!("HIT LENGTH OF FRAME{}", elapsed_time);
+        //     }
+        //     break;
         // }
 
-        // Return the frame to be displayed
-        println!("return value: {:?}", &self.frames[current_frame]);
-        &self.frames[current_frame]
+        // // Return the frame to be displayed
+        println!("return frame index: {}", animation_state.current_frame);
+        &self.frames[animation_state.current_frame]
     }
 }
 
 // Define your AnimationState struct
 pub struct AnimationState {
     current_animation: usize,
-    start_time: usize,        // Starting time of the animation
-    current_time: usize,      // Current time of the animation
-}
-
-// Implement methods for the AnimationState struct
-impl AnimationState {
-    // Function to tick the animation state
-    fn tick(&mut self, now: usize) {
-        self.current_time = now;
-    }
+    current_frame: usize,      // Current time of the animation
+    start_flag: bool,
+    start_time: Instant,
 }
 
 
@@ -305,15 +290,17 @@ impl engine::Game for Game {
 
             ], 
             times: vec![
-                Duration::from_millis(750),
-                Duration::from_millis(750),
+                Duration::from_millis(250),
+                Duration::from_millis(250),
             ],
         };
-        
+
         let mut animation_state = AnimationState { 
+            // starts at 0
             current_animation: 0,
-            start_time: 0, 
-            current_time: 0, 
+            current_frame: 0, 
+            start_flag: true,
+            start_time:Instant::now(),
         };
         Game {
             camera,
@@ -600,11 +587,10 @@ impl engine::Game for Game {
             }
             // check here that if down, then down animation
             if engine.input.is_key_down(engine::Key::Right) {
-                //  start keeping track of time
-                // play_right_animation()
+                //  start keeping track of time by flipping the animation_State flag
+
                 // 3 paramters; (start_Time, now(current time), speedup factor)
-                //uvs[guy_idx] = self.right_animation.frames[0];
-                uvs[guy_idx] = *self.right_animation.get_current_frame(0, 0, 1);
+                uvs[guy_idx] = *self.right_animation.get_current_frame(&mut self.animation_state);
             }
 
             let door_start: usize = guy_idx + 2;

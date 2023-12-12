@@ -11,7 +11,7 @@ const BULLET_SPEED: f32 = 28.0;
 const SPRITE_MAX: usize = 32;
 const CATCH_DISTANCE: f32 = 16.0;
 const COLLISION_STEPS: usize = 3;
-const SCROLL_SPEED: f32 = 1.0;
+const SCROLL_SPEED: f32 = 4.0;
 struct Guy {
     pos: Vec2,
 }
@@ -44,7 +44,7 @@ impl engine::Game for Game {
             screen_pos: [0.0, 0.0],
             //screen_pos: [-320.0, -640.0],
             // Zoom, play in W and H = 1.0
-            screen_size: [W*3.0, H*3.0],
+            screen_size: [W*1.0, H*1.0],
         };
         #[cfg(target_arch = "wasm32")]
         let sprite_img = {
@@ -96,14 +96,14 @@ impl engine::Game for Game {
         };
         let left_wall = AABB {
             center: Vec2 { x: -160.0, y: H / 2.0 },
-            size: Vec2 { x: 16.0, y: 10000.0 },
+            size: Vec2 { x: 16.0, y: 100000.0 },
         };
         let right_wall = AABB {
             center: Vec2 {
                 x: W + 160.0,
                 y: H / 2.0,
             },
-            size: Vec2 { x: 16.0, y: 10000.0 },
+            size: Vec2 { x: 16.0, y: 100000.0 },
         };
 
         let font = engine::BitFont::with_sheet_region(
@@ -284,7 +284,7 @@ impl engine::Game for Game {
                 vel: Vec2 {
                     x: rng.gen_range((-2.0)..(2.0)),
                     //y: -15.0,
-                    y: rng.gen_range((-4.0)..(-0.5)),
+                    y: rng.gen_range((-16.0)..(-0.5)),
                 },
             });
             self.asteroid_timer = 30;

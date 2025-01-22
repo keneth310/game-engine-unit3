@@ -2,13 +2,13 @@
 
 This project showcases two unique games built using a custom game engine developed from scratch with Frenderer, a modular renderer powered by WGPU. By designing and implementing the underlying engine, we implemented key such as: 4-directional movement, a scrolling camera and world boundaries, simple collisions, and simple room loading, and collectible items around the game world. Both games utilize these features in a distinct ways to produce a unique experience.
 
-### Technical Highlights
+## Technical Highlights
 This project was a great learning experience, and helped us grow our proficiency in Rust programming, game development, and core software engineering principles. Here are some of our highlights:
-    1. Designed and implemented memory-efficient sprite management and rendering pipelines.
-    2. Engineered reusable game systems for collision, camera scrolling, and room transitions.
-    3. Utilized the Cargo build system for streamlined development and dependency management.
-    4. Optimized performance to ensure smooth gameplay across diverse hardware.
-    5. Created detailed and rich sprite-work leveraging Tiled and open-source art.
+1. Designed and implemented memory-efficient sprite management and rendering pipelines.
+2. Engineered reusable game systems for collision, camera scrolling, and room transitions.
+3. Utilized the Cargo build system for streamlined development and dependency management.
+4. Optimized performance to ensure smooth gameplay across diverse hardware.
+5. Created detailed and rich sprite-work leveraging Tiled and open-source art.
 
 ## How to Play
 

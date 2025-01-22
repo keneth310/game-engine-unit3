@@ -4,11 +4,11 @@ This project showcases two unique games built using a custom game engine develop
 
 ### Technical Highlights
 This project was a great learning experience, and helped us grow our proficiency in Rust programming, game development, and core software engineering principles. Here are some of our highlights:
-    Designed and implemented memory-efficient sprite management and rendering pipelines.
-    Engineered reusable game systems for collision, camera scrolling, and room transitions.
-    Utilized the Cargo build system for streamlined development and dependency management.
-    Optimized performance to ensure smooth gameplay across diverse hardware.
-    Created detailed and rich sprite-work leveraging Tiled and open-source art.
+    1. Designed and implemented memory-efficient sprite management and rendering pipelines.
+    2. Engineered reusable game systems for collision, camera scrolling, and room transitions.
+    3. Utilized the Cargo build system for streamlined development and dependency management.
+    4. Optimized performance to ensure smooth gameplay across diverse hardware.
+    5. Created detailed and rich sprite-work leveraging Tiled and open-source art.
 
 ## How to Play
 
